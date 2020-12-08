@@ -1,9 +1,9 @@
 name: Deploy Test Net
 
+on:
   push:
     branches:
       - "*"
-
   pull_request:
     branches:
       - main
@@ -11,6 +11,7 @@ name: Deploy Test Net
 jobs:
 
   network-deploy:
+    name: Test Net Deploy Hooks
     runs-on: [Bootstrap]
     if: "!contains(github.event.head_commit.message, '{{no-op}}')"
     timeout-minutes: 200
