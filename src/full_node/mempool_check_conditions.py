@@ -13,7 +13,7 @@ from src.util.errors import Err
 import time
 from src.util.ints import uint64, uint32
 
-# Sourced from puzzles/generator.clvm
+# Sourced from puzzles/generator.clisp
 GENERATOR_MOD = Program.from_bytes(
     bytes.fromhex(
         "ffff05ffff01ffffff05ff04ffff05ff02f"

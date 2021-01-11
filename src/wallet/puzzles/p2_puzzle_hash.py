@@ -10,7 +10,7 @@ from src.types.program import Program
 from .load_clvm import load_clvm
 
 
-MOD = load_clvm("p2_puzzle_hash.clvm")
+MOD = load_clvm("p2_puzzle_hash.clisp")
 
 
 def puzzle_for_puzzle_hash(inner_puzzle_hash) -> Program:

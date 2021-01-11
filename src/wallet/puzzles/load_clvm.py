@@ -9,15 +9,15 @@ from src.types.program import Program
 
 def load_clvm(clvm_filename, package_or_requirement=__name__) -> Program:
     """
-    This function takes a .clvm file in the given package and compiles it to a
-    .clvm.hex file if the .hex file is missing or older than the .clvm file, then
-    returns the contents of the .hex file as a `Program`.
+    This function takes a .clisp file in the given package and compiles it to a
+    .clisp.o file if the .o file is missing or older than the .clisp file, then
+    returns the contents of the .o file as a `Program`.
 
     clvm_filename: file name
     package_or_requirement: usually `__name__` if the clvm file is in the same package
     """
 
-    hex_filename = f"{clvm_filename}.hex"
+    hex_filename = f"{clvm_filename}.o"
 
     try:
         if pkg_resources.resource_exists(package_or_requirement, clvm_filename):

@@ -6,7 +6,7 @@ from src.types.sized_bytes import bytes32
 from src.wallet.puzzles.load_clvm import load_clvm
 
 
-MOD = load_clvm("genesis-by-coin-id-with-0.clvm", package_or_requirement=__name__)
+MOD = load_clvm("genesis-by-coin-id-with-0.clisp", package_or_requirement=__name__)
 
 
 def create_genesis_or_zero_coin_checker(genesis_coin_id: bytes32) -> Program:
