@@ -1,32 +1,78 @@
-name: Deploy Test Net
+name: Deploy Testnet
 
 on:
-  push:
-    branches:
-      - "*"
-  pull_request:
-    branches:
-      - main
+  workflow_dispatch:
+    inputs:
+      upstream_branch:
+        description: 'branch name to use for dynamic deploys'
+        required: true
+        default: 'dev'
+      instance_name_tag:
+        description: 'name tag to apply to new instances'
+        required: true
+        default: 'chia-testnet'
+      full_node_port:
+        description: 'the port to use for chia communication'
+        require: true
+        default: '68444'
+      event_type:
+        description: 'name tag to apply to new instance'
+        required: false
+      commit_sha:
+        description: 'commit sha to pull other than head'
+        required: false
 
 jobs:
 
-  network-deploy:
-    name: Test Net Deploy Hooks
-    runs-on: [ubuntu-latest]
-    if: "!contains(github.event.head_commit.message, '{{no-op}}')"
-    timeout-minutes: 200
+  deploy-test-net:
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: true
-      max-parallel: 4
+      matrix:
+        os: [ubuntu-latest]
+    if: "!contains(github.event.head_commit.message, 'no-op')"
+    timeout-minutes: 200
     steps:
+      - name: Test for secrets access
+        id: check_secrets
+        shell: bash
+        run: |
+          unset HAS_SECRET
+          if [ -n "$SECRET" ]; then HAS_SECRET='true' ; fi
+          echo ::set-output name=HAS_SECRET::${HAS_SECRET}
+        env:
+          SECRET: "${{ secrets.REPO_ADMIN }}
+
       - name: Set Upstream Variables
         id: set_branch
         shell: bash
         run: |
-            echo "::set-output name=pull_branch_name::${GITHUB_REF##*/}"
-            echo "::set-output name=instance_name_tag::${GITHUB_REF##*/}-testnet"
-            echo "::set-output name=event_type::${{ github.event_name }}"
+          echo "::set-output name=pull_branch_name::${{ github.event.inputs.upstream_branch }}"
+          echo "::set-output name=full_node_port::${{ github.event.inputs.full_node_port }}"
 
-      - name: Invoke Chia Net Deploy
+          if [[  ! -z  "${{ github.event.inputs.commit_sha }}" ]]; then
+            echo "::set-output name=ref::${{ github.event.inputs.commit_sha }}"
+            echo "I set the ref to agree with the upstream, ${{ github.event.inputs.commit_sha }}"
+            echo "::set-output name=instance_name_tag::${{ github.event.inputs.commit_sha }}"
+            echo "I set the  instance tag to agree the commit sha, ${{ github.event.inputs.commit_sha }}"
+            echo "::set-output name=commit_sha::${{ github.event.inputs.commit_sha }}"
+            echo "I set the commit_sha to agree the commit sha, ${{ github.event.inputs.commit_sha }}"
+          else
+            echo "::set-output name=ref::${{ github.event.inputs.upstream_branch }}"
+            echo "I set the ref to agree to the upstream branch head, no sha specified, ${{ github.event.inputs.upstream_branch }}"
+            echo "::set-output name=instance_name_tag::${{ github.event.inputs.instance_name_tag }}"
+            echo "I set the instance tag to agree with the upstream, ${{ github.event.inputs.instance_name_tag }}"
+          fi
+
+          if [[  ! -z  "${{ github.event.inputs.event_type }}" ]]; then
+            echo "::set-output name=event_type::${{ github.event.inputs.event_type }}"
+            echo "I set the event_type to agree with the upstream, ${{ github.event.inputs.event_type }}"
+          else
+            echo "::set-output name=event_type::${{ github.event_name }}"
+            echo "I am using the local value for event_type, was this a direct run?"
+          fi
+
+      - name: Invoke Deploy-Test-Net Hook
+        if: steps.check_secrets.outputs.HAS_SECRET
         run: |
-          curl -XPOST -H "Authorization: token ${{ secrets.REPO_ADMIN }}" -H "Accept: application/vnd.github.v3+json" -H "Content-Type: application/json" https://api.github.com/repos/Chia-Network/chia-net-deploy/actions/workflows/chia-introducer.yml/dispatches --data '{"ref": "master", "inputs": { "event_type": "${{ github.event_name }}" , "upstream_branch": "${{ steps.set_branch.outputs.pull_branch_name }}", "instance_name_tag": "${{ steps.set_branch.outputs.instance_name_tag }}" } }'
+          curl -XPOST -H "Authorization: token ${{ secrets.REPO_ADMIN }}" -H "Accept: application/vnd.github.v3+json" -H "Content-Type: application/json" https://api.github.com/repos/Chia-Network/chia-net-deploy/actions/workflows/chia-introducer.yml/dispatches --data '{"ref": "main", "inputs": { "event_type": "${{ github.event_name }}" , "upstream_branch": "${{ steps.set_branch.outputs.pull_branch_name }}", "instance_name_tag": "${{ steps.set_branch.outputs.instance_name_tag }}", "commit_sha": "${{ steps.set_branch.outputs.commit_sha}}", "full_node_port": "${{ steps.set_branch.outputs.full_node_port }}" } }'
