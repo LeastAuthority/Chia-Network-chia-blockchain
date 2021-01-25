@@ -12,25 +12,10 @@ from src.util.condition_tools import ConditionOpcode, conditions_by_opcode
 from src.util.errors import Err
 import time
 from src.util.ints import uint64, uint32
+from src.wallet.puzzles.lowlevel_generator import get_generator
 
 # Sourced from puzzles/generator.clvm
-GENERATOR_MOD = Program.from_bytes(
-    bytes.fromhex(
-        "ffff05ffff01ffffff05ff04ffff05ff02f"
-        "fff05ffffff05ff03ffff01ff80808080ffff01ffff8080808080808080ffff05ffff"
-        "01ffffffff05ffff04ff05ffff01ffffff05ff04ffff05ff02ffff05ff0dffff05fff"
-        "f05ffffff05ff0affff05ff02ffff05ff09ffff01ff808080808080ff0b80ffff01ff8"
-        "080808080808080ffff01ff0b8080ff018080ffffff05ffff04ffffff05ffff04ffff0af"
-        "f1dffff01ff808080ffff01ffffff05ffff04ffff0aff75ffff01ff808080ffff01ffff"
-        "ff05ffff04ffff0affff11ff0980ffff01ff208080ffff01ffff01ff018080ffff01fff"
-        "f01ff80808080ff01808080ffff01ffff01ff80808080ff01808080ffff01ffff01ff808"
-        "08080ff018080ffff01ffff05ff09ffff05ffffff05ff0effff05ff02ffff05ff25ffff01"
-        "ff808080808080ffff05ffffff05ff25ff558080ffff01ff808080808080ffff01ffff098"
-        "08080ff018080ffff05ffff04ffff08ff0580ffff01ffff0bffff01ff0280ffffff05ff0e"
-        "ffff05ff02ffff05ff09ffff01ff808080808080ffffff05ff0effff05ff02ffff05ff0df"
-        "fff01ff8080808080808080ffff01ffff0bffff01ff0180ff05808080ff01808080ff01808080"
-    )
-)
+GENERATOR_MOD = get_generator()
 
 GENERATOR_FOR_SINGLE_COIN_MOD = Program.from_bytes(
     bytes.fromhex(
