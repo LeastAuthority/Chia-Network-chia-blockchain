@@ -36,12 +36,14 @@ def get_generator():
     programs = args(0)
     coin_solutions = args(1)
     output_list = args(2)
-    coin_solution = first(coin_solutions)
-    coin_name = first(coin_solution)
-    puzzle_solution_pair = first(rest(coin_solution))
-    puzzle = first(puzzle_solution_pair)
-    solution = first(rest(puzzle_solution_pair))
-
+    # coin_solution = first(coin_solutions)
+    # coin_name = first(coin_solution)
+    # puzzle_solution_pair = first(rest(coin_solution))
+    # puzzle = first(puzzle_solution_pair)
+    # solution = first(rest(puzzle_solution_pair))
+    coin_name = args(0, 0, 1)
+    puzzle = args(0, 1, 0, 1)
+    solution = args(1, 1, 0, 1)
     # get_puzhash = eval(first(rest(programs)), make_list(first(rest(programs)), puzzle))
     get_npc = make_list(coin_name, sha256tree(puzzle), eval(puzzle, solution))
 
@@ -60,4 +62,5 @@ def get_generator():
     get_coinsols = eval(1, quote(0))
     core = eval(quote(execute_generate_npc_pair), make_list(quote(generate_npc_pair_list), get_coinsols))
     ret = Program.to(binutils.assemble(core))
+
     return ret
