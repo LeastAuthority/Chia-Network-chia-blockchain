@@ -25,14 +25,8 @@ from clvm_tools import binutils
 
 
 def get_generator():
-    # sha256tree = "((c (i (l 5) (q (sha256 (q 2) ((c 2 9)) (q 2) ((c 2 13)))) (q (sha256 (q 1) 2))) 1))"
-    # ((c (i (l 5)
-    #              (q (sha256 (q 2)
-    #                         ((c 2 (c 2 (c 9 (q ())))))
-    #                         ((c 2 (c 2 (c 13 (q ())))))))
-    #              (q (sha256 (q 1) 5))) 1))) 2))
 
-    #args0 is (generate_npc_pair_list, sha256tree), args1 is coin_solutions, args2 is output_list
+    # args0 is generate_npc_pair_list, args1 is coin_solutions, args2 is output_list
     programs = args(0)
     coin_solutions = args(1)
     output_list = args(2)
