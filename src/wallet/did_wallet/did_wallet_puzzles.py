@@ -95,14 +95,14 @@ def create_recovery_message_puzzle(recovering_coin, newpuz, pubkey):
     puzstring = f"(r (c (q 0x{recovering_coin}) (q ((50 0x{pubkey} 0x{newpuz})))))"
     puz = binutils.assemble(puzstring)
     # return DID_RECOVERY_MESSAGE_MOD.curry(recovering_coin, newpuz, pubkey)
-    return Program(puz)
+    return Program.to(puz)
 
 
 def create_spend_for_message(parent_of_message, recovering_coin, newpuz, pubkey):
     puzzle = create_recovery_message_puzzle(recovering_coin, newpuz, pubkey)
     coin = Coin(parent_of_message, puzzle.get_tree_hash(), uint64(0))
     solution = Program.to([])
-    coinsol = CoinSolution(coin, clvm.to_sexp_f([puzzle, solution]))
+    coinsol = CoinSolution(coin, Program.to([puzzle, solution]))
     return coinsol
 
 
