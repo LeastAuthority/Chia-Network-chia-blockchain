@@ -17,6 +17,7 @@ from src.consensus.constants import ConsensusConstants
 from src.consensus.sub_block_record import SubBlockRecord
 from src.full_node.weight_proof import WeightProofHandler
 from src.protocols.wallet_protocol import RespondPuzzleSolution, PuzzleSolutionResponse
+from src.server.server import ChiaServer
 from src.types.coin import Coin
 from src.types.header_block import HeaderBlock
 from src.types.sized_bytes import bytes32
@@ -93,6 +94,7 @@ class WalletStateManager:
     coin_store: WalletCoinStore
     sync_store: WalletSyncStore
     weight_proof_handler: WeightProofHandler
+    server: ChiaServer
 
     @staticmethod
     async def create(
@@ -100,12 +102,14 @@ class WalletStateManager:
         config: Dict,
         db_path: Path,
         constants: ConsensusConstants,
+        server: ChiaServer,
         name: str = None,
     ):
         self = WalletStateManager()
         self.new_wallet = False
         self.config = config
         self.constants = constants
+        self.server = server
 
         if name:
             self.log = logging.getLogger(name)
@@ -902,15 +906,22 @@ class WalletStateManager:
     async def search_blockrecords_for_puzzlehash(self, puzzlehash):
         header_hash_of_interest = None
         heighest_block_height = 0
-        for header_hash in self.block_records:
-            record = self.block_records[header_hash]
-            tx_filter = PyBIP158([b for b in record.transactions_filter])
-            if (
-                tx_filter.Match(bytearray(puzzlehash))
-                and record.height > heighest_block_height
-            ):
-                header_hash_of_interest = header_hash
-                heighest_block_height = record.height
+        peak: Optional[SubBlockRecord] = self.blockchain.get_peak()
+
+        peak_block: Optional[HeaderBlockRecord] = await self.blockchain.block_store.get_header_block_record(
+            peak.header_hash
+        )
+        while peak_block is not None:
+            tx_filter = PyBIP158([b for b in peak_block.header.transactions_filter])
+            if tx_filter.Match(bytearray(puzzlehash)) and peak_block.sub_block_height > heighest_block_height:
+                header_hash_of_interest = peak_block.header_hash
+                heighest_block_height = peak_block.sub_block_height
+                break
+            else:
+                peak_block = await self.blockchain.block_store.get_header_block_record(
+                    peak_block.header.prev_header_hash
+                )
+
         return heighest_block_height, header_hash_of_interest
 
     async def create_wallet_backup(self, file_path: Path):
