@@ -1,0 +1,3 @@
+(mod (recovering_coin newpuz pubkey)
+    (r (r (c recovering_coin (list (list 57 pubkey newpuz)))))
+)

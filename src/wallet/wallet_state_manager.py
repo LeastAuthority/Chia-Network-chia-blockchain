@@ -881,6 +881,21 @@ class WalletStateManager:
 
         return start_height
 
+    # search through the blockrecords and return the most recent coin to use a given puzzlehash
+    async def search_blockrecords_for_puzzlehash(self, puzzlehash):
+        header_hash_of_interest = None
+        heighest_block_height = 0
+        for header_hash in self.block_records:
+            record = self.block_records[header_hash]
+            tx_filter = PyBIP158([b for b in record.transactions_filter])
+            if (
+                tx_filter.Match(bytearray(puzzlehash))
+                and record.height > heighest_block_height
+            ):
+                header_hash_of_interest = header_hash
+                heighest_block_height = record.height
+        return heighest_block_height, header_hash_of_interest
+
     async def create_wallet_backup(self, file_path: Path):
         all_wallets = await self.get_all_wallet_info_entries()
         for wallet in all_wallets:
