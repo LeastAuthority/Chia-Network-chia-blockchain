@@ -110,7 +110,6 @@ class TestDIDWallet:
         )
         coins = await did_wallet_1.select_coins(1)
         coin = coins.copy().pop()
-        breakpoint()
         assert did_wallet_2.did_info.temp_coin == coin
 
         newpuz = await did_wallet_2.get_new_puzzle()

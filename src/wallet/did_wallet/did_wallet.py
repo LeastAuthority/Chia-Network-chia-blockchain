@@ -346,11 +346,11 @@ class DIDWallet:
                 raise Exception
             innerpuz = Program.from_bytes(bytes.fromhex(details[2]))
             full_puz = did_wallet_puzzles.create_fullpuz(innerpuz, genesis_id)
-            puzzle_hash = full_puz.get_tree_hash()
+            full_puzzle_hash = full_puz.get_tree_hash()
             (
                 sub_height,
                 header_hash,
-            ) = await self.wallet_state_manager.search_blockrecords_for_puzzlehash(puzzle_hash)
+            ) = await self.wallet_state_manager.search_blockrecords_for_puzzlehash(full_puzzle_hash)
 
             full_nodes = self.wallet_state_manager.server.connection_by_type[NodeType.FULL_NODE]
             additions: Union[RespondAdditions, RejectAdditionsRequest, None] = None
@@ -371,7 +371,7 @@ class DIDWallet:
 
             for puzzle_list_coin in additions.coins:
                 puzzle_hash, coins = puzzle_list_coin
-                if puzzle_hash == puzzle_hash:
+                if puzzle_hash == full_puzzle_hash:
                     # our coin
                     for coin in coins:
                         if coin.name() in all_parents:
