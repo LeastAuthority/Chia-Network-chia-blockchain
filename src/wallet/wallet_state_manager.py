@@ -165,6 +165,13 @@ class WalletStateManager:
             elif wallet_info.type == WalletType.RATE_LIMITED:
                 wallet = await RLWallet.create(self, wallet_info)
                 self.wallets[wallet_info.id] = wallet
+            elif wallet_info.type == WalletType.DISTRIBUTED_ID:
+                wallet = await CCWallet.create(
+                    self,
+                    self.main_wallet,
+                    wallet_info,
+                )
+                self.wallets[wallet_info.id] = wallet
 
         async with self.puzzle_store.lock:
             index = await self.puzzle_store.get_last_derivation_path()
