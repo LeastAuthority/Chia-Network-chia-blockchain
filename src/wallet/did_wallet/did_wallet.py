@@ -374,14 +374,14 @@ class DIDWallet:
                 if puzzle_hash == full_puzzle_hash:
                     # our coin
                     for coin in coins:
-                        if coin.name() in all_parents:
-                            continue
                         future_parent = CCParent(
                             coin.parent_coin_info,
                             innerpuz.get_tree_hash(),
                             coin.amount,
                         )
                         await self.add_parent(coin.name(), future_parent)
+                        if coin.name() in all_parents:
+                            continue
                         did_info = DIDInfo(
                             genesis_id,
                             backup_ids,
@@ -701,7 +701,11 @@ class DIDWallet:
         )
         parent_info = await self.get_parent_for_coin(coin)
         assert parent_info is not None
-        fullsol = Program.to([parent_info.as_list(), coin.amount, innersol])
+        fullsol = Program.to([[
+                    parent_info.parent_name,
+                    parent_info.inner_puzzle_hash,
+                    parent_info.amount,
+                ], coin.amount, innersol])
         list_of_solutions = [
             CoinSolution(
                 coin,
@@ -723,22 +727,7 @@ class DIDWallet:
             spend_bundle = SpendBundle(list_of_solutions, aggsig)
         else:
             spend_bundle = spend_bundle.aggregate([spend_bundle, SpendBundle(list_of_solutions, aggsig)])
-        did_record = TransactionRecord(
-            confirmed_at_index=uint32(0),
-            created_at_time=uint64(int(time.time())),
-            to_puzzle_hash=puzhash,
-            amount=uint64(coin.amount),
-            fee_amount=uint64(0),
-            incoming=False,
-            confirmed=False,
-            sent=uint32(0),
-            spend_bundle=spend_bundle,
-            additions=spend_bundle.additions(),
-            removals=spend_bundle.removals(),
-            wallet_id=self.wallet_info.id,
-            sent_to=[],
-            trade_id=None,
-        )
+
         did_record = TransactionRecord(
             confirmed_at_sub_height=uint32(0),
             confirmed_at_height=uint32(0),
