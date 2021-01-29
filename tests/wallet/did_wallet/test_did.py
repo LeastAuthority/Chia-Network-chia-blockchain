@@ -108,9 +108,11 @@ class TestDIDWallet:
         did_wallet_2 = await DIDWallet.create_new_did_wallet_from_recovery(
             wallet_node_1.wallet_state_manager, wallet_1, filename
         )
-        coins = await did_wallet_2.select_coins(1)
+        coins = await did_wallet_1.select_coins(1)
         coin = coins.copy().pop()
+        breakpoint()
         assert did_wallet_2.did_info.temp_coin == coin
+
         newpuz = await did_wallet_2.get_new_puzzle()
         newpuzhash = newpuz.get_tree_hash()
         pubkey = bytes(

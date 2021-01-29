@@ -264,7 +264,7 @@ class DIDWallet:
             used_coins: Set = set()
 
             # Use older coins first
-            unspent.sort(key=lambda r: r.confirmed_block_index)
+            unspent.sort(key=lambda r: r.confirmed_block_sub_height)
 
             # Try to use coins from the store, if there isn't enough of "unused"
             # coins use change coins that are not confirmed yet
@@ -280,7 +280,7 @@ class DIDWallet:
                     continue
                 sum_value += coinrecord.coin.amount
                 used_coins.add(coinrecord.coin)
-                self.log.info(f"Selected coin: {coinrecord.coin.name()} at height {coinrecord.confirmed_block_index}!")
+                self.log.info(f"Selected coin: {coinrecord.coin.name()} at height {coinrecord.confirmed_block_sub_height}!")
 
             # This happens when we couldn't use one of the coins because it's already used
             # but unconfirmed, and we are waiting for the change. (unconfirmed_additions)
@@ -355,7 +355,6 @@ class DIDWallet:
             full_nodes = self.wallet_state_manager.server.connection_by_type[NodeType.FULL_NODE]
             additions: Union[RespondAdditions, RejectAdditionsRequest, None] = None
             for id, node in full_nodes.items():
-                breakpoint()
                 request = wallet_protocol.RequestAdditions(sub_height, header_hash, None)
                 additions = await node.request_additions(request)
                 if additions is not None:
@@ -368,7 +367,7 @@ class DIDWallet:
             for puzzle_list_coin in additions.coins:
                 puzzle_hash, coins = puzzle_list_coin
                 for coin in coins:
-                    all_parents.add(coin.name())
+                    all_parents.add(coin.parent_coin_info)
 
             for puzzle_list_coin in additions.coins:
                 puzzle_hash, coins = puzzle_list_coin
@@ -379,22 +378,20 @@ class DIDWallet:
                             continue
                         future_parent = CCParent(
                             coin.parent_coin_info,
-                            self.did_info.current_inner.get_tree_hash(),
+                            innerpuz.get_tree_hash(),
                             coin.amount,
                         )
                         await self.add_parent(coin.name(), future_parent)
                         did_info = DIDInfo(
-                            self.did_info.my_did,
-                            self.did_info.backup_ids,
-                            self.did_info.num_of_backup_ids_needed,
+                            genesis_id,
+                            backup_ids,
+                            num_of_backup_ids_needed,
                             self.did_info.parent_info,
-                            self.did_info.current_inner,
+                            innerpuz,
                             coin,
                         )
                         await self.save_info(did_info)
 
-            did_info = DIDInfo(genesis_id, backup_ids, num_of_backup_ids_needed, [], innerpuz, None)
-            await self.save_info(did_info)
             await self.wallet_state_manager.update_wallet_puzzle_hashes(self.wallet_info.id)
             return
         except Exception as e:
