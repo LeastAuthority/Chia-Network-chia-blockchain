@@ -254,7 +254,7 @@ class WalletStateManager:
                     uint32(target_wallet.wallet_info.id),
                 )
             )
-            await self.puzzle_store.add_derivation_paths(derivation_paths)
+        await self.puzzle_store.add_derivation_paths(derivation_paths)
 
     async def create_more_puzzle_hashes(self, from_zero: bool = False):
         """
@@ -689,7 +689,7 @@ class WalletStateManager:
         )
         await self.coin_store.add_coin_record(coin_record)
 
-        if wallet_type == WalletType.COLOURED_COIN:
+        if wallet_type == WalletType.COLOURED_COIN or wallet_type == WalletType.DISTRIBUTED_ID:
             wallet: CCWallet = self.wallets[wallet_id]
             # TODO(straya): should this use height to hash instead of sub_height to hash
             header_hash: bytes32 = self.blockchain.sub_height_to_hash(sub_height)

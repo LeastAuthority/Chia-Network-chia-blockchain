@@ -1,9 +1,9 @@
 import logging
 import time
 import json
-import clvm
+
 from typing import Dict, Optional, List, Any, Set, Tuple, Union
-from clvm.EvalError import EvalError
+
 from blspy import AugSchemeMPL, G1Element
 from secrets import token_bytes
 
@@ -12,15 +12,13 @@ from src.protocols.wallet_protocol import RespondAdditions, RejectAdditionsReque
 from src.server.outbound_message import NodeType
 from src.types.coin import Coin
 from src.types.coin_solution import CoinSolution
-from src.types.condition_opcodes import ConditionOpcode
+
 from src.types.program import Program
 from src.types.spend_bundle import SpendBundle
 from src.types.sized_bytes import bytes32
 from src.wallet.util.transaction_type import TransactionType
-from src.util.condition_tools import conditions_dict_for_solution
-from src.util.json_util import dict_to_json_str
 from src.util.ints import uint64, uint32, uint8
-from src.wallet.block_record import HeaderBlockRecord
+
 from src.wallet.did_wallet.did_info import DIDInfo
 from src.wallet.cc_wallet.ccparent import CCParent
 from src.wallet.transaction_record import TransactionRecord
@@ -96,7 +94,7 @@ class DIDWallet:
             fee_amount=uint64(0),
             confirmed=False,
             sent=uint32(0),
-            spend_bundle=spend_bundle,
+            spend_bundle=None,
             additions=spend_bundle.additions(),
             removals=spend_bundle.removals(),
             wallet_id=self.id(),
@@ -280,7 +278,6 @@ class DIDWallet:
                     continue
                 sum_value += coinrecord.coin.amount
                 used_coins.add(coinrecord.coin)
-                self.log.info(f"Selected coin: {coinrecord.coin.name()} at height {coinrecord.confirmed_block_sub_height}!")
 
             # This happens when we couldn't use one of the coins because it's already used
             # but unconfirmed, and we are waiting for the change. (unconfirmed_additions)
@@ -293,10 +290,9 @@ class DIDWallet:
         return used_coins
 
     # This will be used in the recovery case where we don't have the parent info already
-    async def coin_added(self, coin: Coin, height: int, header_hash: bytes32, removals: List[Coin]):
+    async def coin_added(self, coin: Coin, height: int, header_hash: bytes32, removals: List[Coin], sub_height: uint32):
         """ Notification from wallet state manager that wallet has been received. """
         self.log.info("DID wallet has been notified that coin was added")
-
         inner_puzzle = await self.inner_puzzle_for_did_puzzle(coin.puzzle_hash)
         new_info = DIDInfo(
             self.did_info.my_did,
@@ -397,71 +393,6 @@ class DIDWallet:
         except Exception as e:
             raise e
 
-    # async def load_backup_callback(
-    #     self, height: uint32, header_hash: bytes32, generator: Program, action_id: int
-    # ):
-    #     """ Notification that wallet has received a generator it asked for. """
-    #     block: Optional[
-    #         HeaderBlockRecord
-    #     ] = await self.wallet_state_manager.wallet_store.get_block_record(header_hash)
-    #     assert block is not None
-    #     full_puz = did_wallet_puzzles.create_fullpuz(
-    #         self.did_info.current_inner, self.did_info.my_did
-    #     )
-    #     fullpuzhash = full_puz.get_tree_hash()
-    #     spent_coins = []
-    #     try:
-    #         cost_run, sexp = generator.run_with_cost([])
-    #     except EvalError:
-    #         return False
-    #     for name_solution in sexp.as_iter():
-    #         _ = name_solution.as_python()
-    #         if len(_) != 2:
-    #             return False
-    #         if not isinstance(_[0], bytes) or len(_[0]) != 32:
-    #             return False
-    #         coin_name = bytes32(_[0])
-    #         if not isinstance(_[1], list) or len(_[1]) != 2:
-    #             return False
-    #         puzzle_solution_program = name_solution.rest().first()
-    #         try:
-    #             error, conditions_dict, cost_run = conditions_dict_for_solution(
-    #                 puzzle_solution_program
-    #             )
-    #             if error:
-    #                 return False
-    #         except clvm.EvalError:
-    #
-    #             return False
-    #         if conditions_dict is None:
-    #             conditions_dict = {}
-    #
-    #         if ConditionOpcode.CREATE_COIN in conditions_dict:
-    #             for varpair in conditions_dict[ConditionOpcode.CREATE_COIN]:
-    #                 if varpair.var1 == fullpuzhash and varpair.var2 is not None:
-    #                     spent_coins.append(coin_name)
-    #                     amount = uint64(int.from_bytes(varpair.var2, "big"))
-    #                     my_coin = Coin(coin_name, fullpuzhash, amount)
-    #                     future_parent = CCParent(
-    #                         coin_name,
-    #                         self.did_info.current_inner.get_tree_hash(),
-    #                         amount,
-    #                     )
-    #                     await self.add_parent(my_coin.name(), future_parent)
-    #         for c in spent_coins:
-    #             my_coin = Coin(c, fullpuzhash, amount)
-    #             if my_coin.name() not in spent_coins:
-    #                 did_info = DIDInfo(
-    #                     self.did_info.my_did,
-    #                     self.did_info.backup_ids,
-    #                     self.did_info.num_of_backup_ids_needed,
-    #                     self.did_info.parent_info,
-    #                     self.did_info.current_inner,
-    #                     my_coin,
-    #                 )
-    #                 await self.save_info(did_info)
-    #     await self.wallet_state_manager.set_action_done(action_id)
-
     def puzzle_for_pk(self, pubkey: bytes) -> Program:
         innerpuz = did_wallet_puzzles.create_innerpuz(
             pubkey, self.did_info.backup_ids, self.did_info.num_of_backup_ids_needed
@@ -525,7 +456,7 @@ class DIDWallet:
             confirmed_at_sub_height=uint32(0),
             confirmed_at_height=uint32(0),
             created_at_time=uint64(int(time.time())),
-            to_puzzle_hash=puz_hash,
+            to_puzzle_hash=puzhash,
             amount=uint64(coin.amount),
             fee_amount=uint64(0),
             confirmed=False,
@@ -701,11 +632,15 @@ class DIDWallet:
         )
         parent_info = await self.get_parent_for_coin(coin)
         assert parent_info is not None
-        fullsol = Program.to([[
+        fullsol = Program.to(
+            [
+                [
                     parent_info.parent_name,
                     parent_info.inner_puzzle_hash,
                     parent_info.amount,
-                ], coin.amount, innersol])
+                ], coin.amount, innersol
+            ]
+        )
         list_of_solutions = [
             CoinSolution(
                 coin,
