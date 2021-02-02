@@ -398,11 +398,7 @@ class WalletRpcApi:
                 coin_list = did_wallet.did_info.temp_coin.as_list()
                 newpuzhash = (await did_wallet.get_new_puzzle()).get_tree_hash().hex()
                 pubkey = bytes(
-                    (
-                        await wallet_state_manager.get_unused_derivation_record(
-                            did_wallet.wallet_info.id
-                        )
-                    ).pubkey
+                    (await wallet_state_manager.get_unused_derivation_record(did_wallet.wallet_info.id)).pubkey
                 ).hex()
                 return {
                     "type": did_wallet.type(),
@@ -699,14 +695,10 @@ class WalletRpcApi:
         for _ in request["new_list"]:
             recovery_list.append(bytes.fromhex(_))
         if "num_verifications_required" in request:
-            new_amount_verifications_required = uint64(
-                request["num_verifications_required"]
-            )
+            new_amount_verifications_required = uint64(request["num_verifications_required"])
         else:
             new_amount_verifications_required = len(recovery_list)
-        success = await wallet.update_recovery_list(
-            recovery_list, new_amount_verifications_required
-        )
+        success = await wallet.update_recovery_list(recovery_list, new_amount_verifications_required)
         # Update coin with new ID info
         updated_puz = await wallet.get_new_puzzle()
         spend_bundle = await wallet.create_spend(updated_puz.get_tree_hash())
@@ -756,9 +748,7 @@ class WalletRpcApi:
         (
             info_list,
             message_spend_bundle,
-        ) = await wallet.load_attest_files_for_recovery_spend(
-            request["attest_filenames"]
-        )
+        ) = await wallet.load_attest_files_for_recovery_spend(request["attest_filenames"])
         pubkey = G1Element.from_bytes(bytes.fromhex(request["pubkey"]))
 
         success = await wallet.recovery_spend(
@@ -773,13 +763,7 @@ class WalletRpcApi:
     async def did_get_pubkey(self, request):
         wallet_id = int(request["wallet_id"])
         wallet: DIDWallet = self.service.wallet_state_manager.wallets[wallet_id]
-        pubkey = bytes(
-            (
-                await wallet.wallet_state_manager.get_unused_derivation_record(
-                    wallet_id
-                )
-            ).pubkey
-        ).hex()
+        pubkey = bytes((await wallet.wallet_state_manager.get_unused_derivation_record(wallet_id)).pubkey).hex()
         return {"success": True, "pubkey": pubkey}
 
     async def did_create_attest(self, request):
@@ -807,11 +791,7 @@ class WalletRpcApi:
         coin_name = did_wallet.did_info.temp_coin.name().hex()
         newpuzhash = (await did_wallet.get_new_puzzle()).get_tree_hash().hex()
         pubkey = bytes(
-            (
-                await self.service.wallet_state_manager.get_unused_derivation_record(
-                    did_wallet.wallet_info.id
-                )
-            ).pubkey
+            (await self.service.wallet_state_manager.get_unused_derivation_record(did_wallet.wallet_info.id)).pubkey
         ).hex()
         return {
             "success": True,

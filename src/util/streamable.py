@@ -85,45 +85,45 @@ def dataclass_from_dict(klass, d):
 
 
 def recurse_jsonify(d):
-        """
-        Makes bytes objects and unhashable types into strings with 0x, and makes large ints into
-        strings.
-        """
-        if isinstance(d, list) or isinstance(d, tuple):
-            new_list = []
-            for item in d:
-                if type(item) in unhashable_types or issubclass(type(item), bytes):
-                    item = f"0x{bytes(item).hex()}"
-                if isinstance(item, dict):
-                    item = recurse_jsonify(item)
-                if isinstance(item, list):
-                    item = recurse_jsonify(item)
-                if isinstance(item, tuple):
-                    item = recurse_jsonify(item)
-                if isinstance(item, Enum):
-                    item = item.name
-                if isinstance(item, int) and type(item) in big_ints:
-                    item = str(item)
-                new_list.append(item)
-            d = new_list
+    """
+    Makes bytes objects and unhashable types into strings with 0x, and makes large ints into
+    strings.
+    """
+    if isinstance(d, list) or isinstance(d, tuple):
+        new_list = []
+        for item in d:
+            if type(item) in unhashable_types or issubclass(type(item), bytes):
+                item = f"0x{bytes(item).hex()}"
+            if isinstance(item, dict):
+                item = recurse_jsonify(item)
+            if isinstance(item, list):
+                item = recurse_jsonify(item)
+            if isinstance(item, tuple):
+                item = recurse_jsonify(item)
+            if isinstance(item, Enum):
+                item = item.name
+            if isinstance(item, int) and type(item) in big_ints:
+                item = str(item)
+            new_list.append(item)
+        d = new_list
 
-        else:
-            for key, value in d.items():
-                if type(key) in unhashable_types or issubclass(type(key), bytes):
-                    key = f"0x{bytes(value).hex()}"
-                if type(value) in unhashable_types or issubclass(type(value), bytes):
-                    d[key] = f"0x{bytes(value).hex()}"
-                if isinstance(value, dict):
-                    d[key] = recurse_jsonify(value)
-                if isinstance(value, list):
-                    d[key] = recurse_jsonify(value)
-                if isinstance(value, tuple):
-                    d[key] = recurse_jsonify(value)
-                if isinstance(value, Enum):
-                    d[key] = value.name
-                if isinstance(value, int) and type(value) in big_ints:
-                    d[key] = str(value)
-        return d
+    else:
+        for key, value in d.items():
+            if type(key) in unhashable_types or issubclass(type(key), bytes):
+                key = f"0x{bytes(value).hex()}"
+            if type(value) in unhashable_types or issubclass(type(value), bytes):
+                d[key] = f"0x{bytes(value).hex()}"
+            if isinstance(value, dict):
+                d[key] = recurse_jsonify(value)
+            if isinstance(value, list):
+                d[key] = recurse_jsonify(value)
+            if isinstance(value, tuple):
+                d[key] = recurse_jsonify(value)
+            if isinstance(value, Enum):
+                d[key] = value.name
+            if isinstance(value, int) and type(value) in big_ints:
+                d[key] = str(value)
+    return d
 
 
 def streamable(cls: Any):

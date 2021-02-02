@@ -114,11 +114,7 @@ class TestDIDWallet:
         newpuz = await did_wallet_2.get_new_puzzle()
         newpuzhash = newpuz.get_tree_hash()
         pubkey = bytes(
-            (
-                await did_wallet_2.wallet_state_manager.get_unused_derivation_record(
-                    did_wallet_2.wallet_info.id
-                )
-            ).pubkey
+            (await did_wallet_2.wallet_state_manager.get_unused_derivation_record(did_wallet_2.wallet_info.id)).pubkey
         )
         message_spend_bundle = await did_wallet_0.create_attestment(
             did_wallet_2.did_info.temp_coin.name(), newpuzhash, pubkey, "test.attest"
@@ -226,34 +222,22 @@ class TestDIDWallet:
         coins = await did_wallet_3.select_coins(1)
         coin = coins.pop()
         pubkey = (
-            await did_wallet_2.wallet_state_manager.get_unused_derivation_record(
-                did_wallet_2.wallet_info.id
-            )
+            await did_wallet_2.wallet_state_manager.get_unused_derivation_record(did_wallet_2.wallet_info.id)
         ).pubkey
-        message_spend_bundle = await did_wallet.create_attestment(
-            coin.name(), ph, pubkey, "test1.attest"
-        )
-        message_spend_bundle2 = await did_wallet_2.create_attestment(
-            coin.name(), ph, pubkey, "test2.attest"
-        )
-        message_spend_bundle = message_spend_bundle.aggregate(
-            [message_spend_bundle, message_spend_bundle2]
-        )
+        message_spend_bundle = await did_wallet.create_attestment(coin.name(), ph, pubkey, "test1.attest")
+        message_spend_bundle2 = await did_wallet_2.create_attestment(coin.name(), ph, pubkey, "test2.attest")
+        message_spend_bundle = message_spend_bundle.aggregate([message_spend_bundle, message_spend_bundle2])
 
         (
             test_info_list,
             test_message_spend_bundle,
-        ) = await did_wallet_3.load_attest_files_for_recovery_spend(
-            ["test1.attest", "test2.attest"]
-        )
+        ) = await did_wallet_3.load_attest_files_for_recovery_spend(["test1.attest", "test2.attest"])
         assert message_spend_bundle == test_message_spend_bundle
 
         for i in range(1, num_blocks):
             await full_node_1.farm_new_block(FarmNewBlockProtocol(ph2))
 
-        await did_wallet_3.recovery_spend(
-            coin, ph, test_info_list, pubkey, message_spend_bundle
-        )
+        await did_wallet_3.recovery_spend(coin, ph, test_info_list, pubkey, message_spend_bundle)
 
         for i in range(1, num_blocks):
             await full_node_1.farm_new_block(FarmNewBlockProtocol(ph2))
@@ -301,11 +285,7 @@ class TestDIDWallet:
         coins = await did_wallet.select_coins(1)
         coin = coins.pop()
         info = Program.to([])
-        pubkey = (
-            await did_wallet.wallet_state_manager.get_unused_derivation_record(
-                did_wallet.wallet_info.id
-            )
-        ).pubkey
+        pubkey = (await did_wallet.wallet_state_manager.get_unused_derivation_record(did_wallet.wallet_info.id)).pubkey
         spend_bundle = await did_wallet.recovery_spend(
             coin, ph, info, pubkey, SpendBundle([], AugSchemeMPL.aggregate([]))
         )
@@ -379,13 +359,9 @@ class TestDIDWallet:
         coins = await did_wallet_2.select_coins(1)
         coin = coins.pop()
         pubkey = (
-            await did_wallet_2.wallet_state_manager.get_unused_derivation_record(
-                did_wallet_2.wallet_info.id
-            )
+            await did_wallet_2.wallet_state_manager.get_unused_derivation_record(did_wallet_2.wallet_info.id)
         ).pubkey
-        message_spend_bundle = await did_wallet.create_attestment(
-            coin.name(), new_ph, pubkey, "test.attest"
-        )
+        message_spend_bundle = await did_wallet.create_attestment(coin.name(), new_ph, pubkey, "test.attest")
         for i in range(1, num_blocks):
             await full_node_1.farm_new_block(FarmNewBlockProtocol(ph2))
 
@@ -393,9 +369,7 @@ class TestDIDWallet:
             info,
             message_spend_bundle,
         ) = await did_wallet_2.load_attest_files_for_recovery_spend(["test.attest"])
-        await did_wallet_2.recovery_spend(
-            coin, new_ph, info, pubkey, message_spend_bundle
-        )
+        await did_wallet_2.recovery_spend(coin, new_ph, info, pubkey, message_spend_bundle)
 
         for i in range(1, num_blocks):
             await full_node_1.farm_new_block(FarmNewBlockProtocol(ph))
@@ -407,11 +381,7 @@ class TestDIDWallet:
         coins = await did_wallet.select_coins(1)
         coin = coins.pop()
 
-        pubkey = (
-            await did_wallet.wallet_state_manager.get_unused_derivation_record(
-                did_wallet.wallet_info.id
-            )
-        ).pubkey
+        pubkey = (await did_wallet.wallet_state_manager.get_unused_derivation_record(did_wallet.wallet_info.id)).pubkey
         await did_wallet_2.create_attestment(coin.name(), ph, pubkey, "test.attest")
         for i in range(1, num_blocks):
             await full_node_1.farm_new_block(FarmNewBlockProtocol(ph2))
@@ -419,9 +389,7 @@ class TestDIDWallet:
             test_info_list,
             test_message_spend_bundle,
         ) = await did_wallet.load_attest_files_for_recovery_spend(["test.attest"])
-        await did_wallet.recovery_spend(
-            coin, ph, test_info_list, pubkey, test_message_spend_bundle
-        )
+        await did_wallet.recovery_spend(coin, ph, test_info_list, pubkey, test_message_spend_bundle)
 
         for i in range(1, num_blocks):
             await full_node_1.farm_new_block(FarmNewBlockProtocol(ph))
@@ -475,9 +443,7 @@ class TestDIDWallet:
         )
 
         # Add the hacked puzzle to the puzzle store so that it is recognised as "our" puzzle
-        old_devrec = await did_wallet.wallet_state_manager.get_unused_derivation_record(
-            did_wallet.wallet_info.id
-        )
+        old_devrec = await did_wallet.wallet_state_manager.get_unused_derivation_record(did_wallet.wallet_info.id)
         devrec = DerivationRecord(
             old_devrec.index,
             puz.get_tree_hash(),
@@ -485,9 +451,7 @@ class TestDIDWallet:
             old_devrec.wallet_type,
             old_devrec.wallet_id,
         )
-        await did_wallet.wallet_state_manager.puzzle_store.add_derivation_paths(
-            [devrec]
-        )
+        await did_wallet.wallet_state_manager.puzzle_store.add_derivation_paths([devrec])
         await did_wallet.create_spend(puz.get_tree_hash())
 
         for i in range(1, num_blocks):
@@ -612,12 +576,8 @@ class TestDIDWallet:
         # sign for AGG_SIG_ME
         message = bytes(coin.puzzle_hash) + bytes(coin.name())
         pubkey = did_wallet_puzzles.get_pubkey_from_innerpuz(innerpuz)
-        index = await did_wallet.wallet_state_manager.puzzle_store.index_for_pubkey(
-            pubkey
-        )
-        private = master_sk_to_wallet_sk(
-            did_wallet.wallet_state_manager.private_key, index
-        )
+        index = await did_wallet.wallet_state_manager.puzzle_store.index_for_pubkey(pubkey)
+        private = master_sk_to_wallet_sk(did_wallet.wallet_state_manager.private_key, index)
         signature = AugSchemeMPL.sign(private, message)
         sigs = [signature]
         aggsig = AugSchemeMPL.aggregate(sigs)
