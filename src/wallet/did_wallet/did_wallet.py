@@ -638,7 +638,9 @@ class DIDWallet:
                     parent_info.parent_name,
                     parent_info.inner_puzzle_hash,
                     parent_info.amount,
-                ], coin.amount, innersol
+                ],
+                coin.amount,
+                innersol,
             ]
         )
         list_of_solutions = [

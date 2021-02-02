@@ -7,7 +7,6 @@ from src.types.coin import Coin
 from src.types.coin_solution import CoinSolution
 from src.util.ints import uint64
 from src.wallet.puzzles.load_clvm import load_clvm
-import clvm
 
 DID_CORE_MOD = load_clvm("did_core.clvm")
 DID_INNERPUZ_MOD = load_clvm("did_innerpuz.clvm")
@@ -15,13 +14,9 @@ DID_RECOVERY_MESSAGE_MOD = load_clvm("did_recovery_message.clvm")
 DID_GROUP_MOD = load_clvm("did_groups.clvm")
 
 
-def create_innerpuz(
-    pubkey: bytes, identities: List[bytes], num_of_backup_ids_needed: uint64
-) -> Program:
+def create_innerpuz(pubkey: bytes, identities: List[bytes], num_of_backup_ids_needed: uint64) -> Program:
     backup_ids_hash = Program(Program.to(identities)).get_tree_hash()
-    return DID_INNERPUZ_MOD.curry(
-        DID_CORE_MOD.get_tree_hash(), pubkey, backup_ids_hash, num_of_backup_ids_needed
-    )
+    return DID_INNERPUZ_MOD.curry(DID_CORE_MOD.get_tree_hash(), pubkey, backup_ids_hash, num_of_backup_ids_needed)
 
 
 def create_fullpuz(innerpuz, genesis_id) -> Program:
@@ -29,16 +24,14 @@ def create_fullpuz(innerpuz, genesis_id) -> Program:
     return DID_CORE_MOD.curry(mod_hash, genesis_id, innerpuz)
 
 
-def fullpuz_hash_for_inner_puzzle_hash(
-    mod_code, genesis_id, inner_puzzle_hash
-) -> bytes32:
+def fullpuz_hash_for_inner_puzzle_hash(mod_code, genesis_id, inner_puzzle_hash) -> bytes32:
     """
     Given an inner puzzle hash, calculate a puzzle program hash for a specific cc.
     """
     gid_hash = genesis_id.get_tree_hash()
-    return mod_code.curry(
-        mod_code.get_tree_hash(), gid_hash, inner_puzzle_hash
-    ).get_tree_hash(gid_hash, inner_puzzle_hash)
+    return mod_code.curry(mod_code.get_tree_hash(), gid_hash, inner_puzzle_hash).get_tree_hash(
+        gid_hash, inner_puzzle_hash
+    )
 
 
 def get_pubkey_from_innerpuz(innerpuz: Program) -> G1Element:
