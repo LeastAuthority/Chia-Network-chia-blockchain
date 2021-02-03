@@ -28,9 +28,9 @@ export function updateLatestSubBlocks() {
 
 export function getSubBlockRecords(end, count = 10) {
   return async (dispatch) => {
-    const start = end - count;
+    let start = end - count;
     if (start < 0) {
-      let start = 0
+      start = 0
     };
 
     const {
