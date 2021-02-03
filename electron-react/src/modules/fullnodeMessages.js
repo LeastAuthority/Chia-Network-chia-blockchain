@@ -29,6 +29,9 @@ export function updateLatestSubBlocks() {
 export function getSubBlockRecords(end, count = 10) {
   return async (dispatch) => {
     const start = end - count;
+    if (start < 0) {
+      let start = 0
+    };
 
     const {
       data: { sub_block_records },
@@ -44,7 +47,7 @@ export function getSubBlockRecords(end, count = 10) {
       false,
     );
 
-    return sub_block_records.reverse();
+    return [];
   };
 }
 
