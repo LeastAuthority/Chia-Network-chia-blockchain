@@ -1,9 +1,8 @@
 import React from 'react';
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles';
-import { withRouter } from 'react-router-dom';
-import { connect, useDispatch, useSelector } from 'react-redux';
-
+import { useDispatch, useSelector } from 'react-redux';
+import { Trans } from '@lingui/macro';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import Box from '@material-ui/core/Box';
@@ -16,13 +15,14 @@ import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
+import { AlertDialog, Card, Flex, } from '@chia/core';
 
 import {
   did_generate_backup_file,
   did_spend,
   did_update_recovery_ids_action,
   did_create_attest,
-} from '../modules/message';
+} from '../../../modules/message';
 import {
   Accordion,
   AccordionSummary,
@@ -31,13 +31,10 @@ import {
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import { Tooltip } from '@material-ui/core';
 import HelpIcon from '@material-ui/icons/Help';
-import { mojo_to_chia_string } from '../util/chia';
+import { mojo_to_chia_string } from '../../../util/chia';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
-import { openDialog } from '../modules/dialog';
-
-import { unix_to_short_date } from '../util/utils';
-
-// import { openDialog } from "../modules/dialogReducer";
+import { openDialog } from '../../../modules/dialog';
+import WalletHistory from '../WalletHistory';
 
 const drawerWidth = 240;
 
@@ -959,77 +956,7 @@ const HistoryCard = (props) => {
   );
 };
 
-const TransactionTable = (props) => {
-  const classes = useStyles();
-  var id = props.wallet_id;
-  const transactions = useSelector(
-    (state) => state.wallet_state.wallets[id].transactions,
-  );
-
-  if (transactions.length === 0) {
-    return <div style={{ margin: '30px' }}>No previous transactions</div>;
-  }
-
-  const incoming_string = (incoming) => {
-    if (incoming) {
-      return 'Incoming';
-    } else {
-      return 'Outgoing';
-    }
-  };
-  const confirmed_to_string = (confirmed) => {
-    return confirmed ? 'Confirmed' : 'Pending';
-  };
-
-  return (
-    <Paper className={classes.table_root}>
-      <Table stickyHeader className={classes.table}>
-        <TableHead className={classes.head}>
-          <TableRow className={classes.row}>
-            <TableCell className={classes.cell_short}>Type</TableCell>
-            <TableCell className={classes.cell_short}>To</TableCell>
-            <TableCell className={classes.cell_short}>Date</TableCell>
-            <TableCell className={classes.cell_short}>Status</TableCell>
-            <TableCell className={classes.cell_short}>Amount</TableCell>
-            <TableCell className={classes.cell_short}>Fee</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody className={classes.tableBody}>
-          {transactions.map((tx) => (
-            <TableRow
-              className={classes.row}
-              key={tx.to_puzzle_hash + tx.created_at_time + tx.amount}
-            >
-              <TableCell className={classes.cell_short}>
-                {incoming_string(tx.incoming)}
-              </TableCell>
-              <TableCell
-                style={{ maxWidth: '150px' }}
-                className={classes.cell_short}
-              >
-                {tx.to_puzzle_hash}
-              </TableCell>
-              <TableCell className={classes.cell_short}>
-                {unix_to_short_date(tx.created_at_time)}
-              </TableCell>
-              <TableCell className={classes.cell_short}>
-                {confirmed_to_string(tx.confirmed)}
-              </TableCell>
-              <TableCell className={classes.cell_short}>
-                {mojo_to_chia_string(tx.amount)}
-              </TableCell>
-              <TableCell className={classes.cell_short}>
-                {mojo_to_chia_string(tx.fee_amount)}
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </Paper>
-  );
-};
-
-const DistributedIDWallet = (props) => {
+export default function DistributedWallet(props) {
   const classes = useStyles();
   const id = useSelector((state) => state.wallet_menu.id);
   const wallets = useSelector((state) => state.wallet_state.wallets);
@@ -1041,30 +968,32 @@ const DistributedIDWallet = (props) => {
   console.log('TEMP COIN');
   console.log(temp_coin);
 
-  if (temp_coin) {
-    console.log('YES TEMP COIN');
-    return wallets.length > props.wallet_id ? (
-      <Grid className={classes.walletContainer} item xs={12}>
-        <RecoveryCard wallet_id={id}></RecoveryCard>
-      </Grid>
-    ) : (
-      ''
-    );
-  } else {
-    console.log('NO TEMP COIN');
-    return wallets.length > props.wallet_id ? (
-      <Grid className={classes.walletContainer} item xs={12}>
-        <MyDIDCard wallet_id={id}></MyDIDCard>
-        <BalanceCard wallet_id={id}></BalanceCard>
-        <ManageDIDsCard wallet_id={id}></ManageDIDsCard>
-        <CreateAttest wallet_id={id}></CreateAttest>
-        <CashoutCard wallet_id={id}></CashoutCard>
-        <HistoryCard wallet_id={id}></HistoryCard>
-      </Grid>
-    ) : (
-      ''
-    );
+  if (wallets.length > props.wallet_id) {
+    if (temp_coin) {
+      console.log('YES TEMP COIN');
+      return wallets.length > props.wallet_id ? (
+        <Grid className={classes.walletContainer} item xs={12}>
+          <RecoveryCard wallet_id={id}></RecoveryCard>
+        </Grid>
+      ) : (
+        ''
+      );
+    } else {
+      console.log('NO TEMP COIN');
+      return wallets.length > props.wallet_id ? (
+        <Grid className={classes.walletContainer} item xs={12}>
+          <MyDIDCard wallet_id={id}></MyDIDCard>
+          <BalanceCard wallet_id={id}></BalanceCard>
+          <ManageDIDsCard wallet_id={id}></ManageDIDsCard>
+          <CreateAttest wallet_id={id}></CreateAttest>
+          <CashoutCard wallet_id={id}></CashoutCard>
+          <WalletHistory walletId={id} />
+        </Grid>
+      ) : (
+        ''
+      );
+    }
   }
-};
 
-export default withRouter(connect()(DistributedIDWallet));
+  return null;
+}

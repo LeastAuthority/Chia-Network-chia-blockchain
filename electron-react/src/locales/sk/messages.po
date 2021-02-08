@@ -309,7 +309,7 @@ msgstr "Bloky"
 msgid "BlocksCard.unfinished"
 msgstr ""
 
-#: src/components/wallet/create/WalletCreate.jsx:163
+#: src/components/wallet/create/WalletCreate.jsx:182
 msgid "CCListItems.title"
 msgstr "Možnosti coloured mincí"
 
@@ -728,9 +728,13 @@ msgstr ""
 msgid "CreateRLUserWallet.title"
 msgstr ""
 
-#: src/components/wallet/Wallets.tsx:70
+#: src/components/wallet/Wallets.tsx:81
 msgid "CreateWallet.addWallet"
 msgstr "Pridať peňaženku"
+
+#: src/components/wallet/create/WalletCreate.jsx:310
+msgid "DIDListItems.title"
+msgstr ""
 
 #: src/components/dashboard/DashboardSideBar.tsx:26
 msgid "DashboardSideBar.farm"
@@ -1092,31 +1096,43 @@ msgstr "Stav siete"
 msgid "LocaleToggle.helpToTranslate"
 msgstr "Pomôcť s prekladom"
 
-#: src/components/wallet/create/WalletCreate.jsx:115
+#: src/components/wallet/create/WalletCreate.jsx:124
 msgid "MainWalletList.colouredCoin"
 msgstr ""
 
-#: src/components/wallet/create/WalletCreate.jsx:239
+#: src/components/wallet/create/WalletCreate.jsx:258
 msgid "MainWalletList.createAdminWallet"
 msgstr "Vytvoriť peňaženku pre správcu"
 
-#: src/components/wallet/create/WalletCreate.jsx:175
+#: src/components/wallet/create/WalletCreate.jsx:322
+msgid "MainWalletList.createDIDWallet"
+msgstr ""
+
+#: src/components/wallet/create/WalletCreate.jsx:194
 msgid "MainWalletList.createNewColouredCoin"
 msgstr ""
 
-#: src/components/wallet/create/WalletCreate.jsx:251
+#: src/components/wallet/create/WalletCreate.jsx:270
 msgid "MainWalletList.createUserWallet"
 msgstr "Vytvoriť peňaženku pre používateľa"
 
-#: src/components/wallet/create/WalletCreate.jsx:187
+#: src/components/wallet/create/WalletCreate.jsx:206
 msgid "MainWalletList.createWalletForExistingColour"
 msgstr ""
 
-#: src/components/wallet/create/WalletCreate.jsx:125
+#: src/components/wallet/create/WalletCreate.jsx:144
+msgid "MainWalletList.distributedIdentity"
+msgstr ""
+
+#: src/components/wallet/create/WalletCreate.jsx:134
 msgid "MainWalletList.rateLimited"
 msgstr ""
 
-#: src/components/wallet/create/WalletCreate.jsx:103
+#: src/components/wallet/create/WalletCreate.jsx:334
+msgid "MainWalletList.recoverDIDWallet"
+msgstr ""
+
+#: src/components/wallet/create/WalletCreate.jsx:112
 msgid "MainWalletList.title"
 msgstr "Vyberte typ peňaženky"
 
@@ -1625,7 +1641,7 @@ msgstr ""
 #~ msgid "RLHistoryCard.title"
 #~ msgstr "História"
 
-#: src/components/wallet/create/WalletCreate.jsx:227
+#: src/components/wallet/create/WalletCreate.jsx:246
 msgid "RLListItems.title"
 msgstr ""
 
@@ -1821,15 +1837,15 @@ msgstr "Poslať"
 msgid "SendCard.title"
 msgstr "Vytvoriť transakciu"
 
-#: src/components/wallet/Wallets.tsx:108
+#: src/components/wallet/Wallets.tsx:119
 msgid "StatusCard.connections"
 msgstr "pripojenia:"
 
-#: src/components/wallet/Wallets.tsx:102
+#: src/components/wallet/Wallets.tsx:113
 msgid "StatusCard.height"
 msgstr "pozícia:"
 
-#: src/components/wallet/Wallets.tsx:87
+#: src/components/wallet/Wallets.tsx:98
 msgid "StatusCard.status"
 msgstr "stav:"
 
@@ -1841,7 +1857,7 @@ msgstr "stav:"
 #~ msgid "StatusCard.syncing"
 #~ msgstr "synchronizuje sa"
 
-#: src/components/wallet/Wallets.tsx:82
+#: src/components/wallet/Wallets.tsx:93
 msgid "StatusCard.title"
 msgstr "Stav"
 
@@ -2183,15 +2199,19 @@ msgstr "Ďalej"
 msgid "WalletImport.title"
 msgstr "Obnoviť peňaženku pomocou mnemotechnickej pomôcky"
 
-#: src/components/wallet/Wallets.tsx:33
+#: src/components/wallet/Wallets.tsx:34
 msgid "WalletItem.ccWallet"
 msgstr "CC peňaženka"
 
-#: src/components/wallet/Wallets.tsx:29
+#: src/components/wallet/Wallets.tsx:30
 msgid "WalletItem.chiaWallet"
 msgstr "Chia peňaženka"
 
-#: src/components/wallet/Wallets.tsx:40
+#: src/components/wallet/Wallets.tsx:48
+msgid "WalletItem.didWallet"
+msgstr ""
+
+#: src/components/wallet/Wallets.tsx:41
 msgid "WalletItem.rlWallet"
 msgstr "RL peňaženka"
 
@@ -2203,7 +2223,7 @@ msgstr "spojenia:"
 msgid "WalletStatusCard.height"
 msgstr "pozícia:"
 
-#: src/components/wallet/Wallets.tsx:96
+#: src/components/wallet/Wallets.tsx:107
 msgid "WalletStatusCard.not_synced"
 msgstr ""
 
@@ -2212,12 +2232,12 @@ msgid "WalletStatusCard.status"
 msgstr "stav:"
 
 #: src/components/wallet/WalletStatusCard.tsx:19
-#: src/components/wallet/Wallets.tsx:94
+#: src/components/wallet/Wallets.tsx:105
 msgid "WalletStatusCard.synced"
 msgstr "synchronizované"
 
 #: src/components/wallet/WalletStatusCard.tsx:19
-#: src/components/wallet/Wallets.tsx:92
+#: src/components/wallet/Wallets.tsx:103
 msgid "WalletStatusCard.syncing"
 msgstr "synchronizuje sa"
 
@@ -2225,7 +2245,7 @@ msgstr "synchronizuje sa"
 msgid "WalletStatusCard.title"
 msgstr "Stav"
 
-#: src/components/wallet/Wallets.tsx:120
+#: src/components/wallet/Wallets.tsx:131
 msgid "Wallets.title"
 msgstr "Peňaženky"
 

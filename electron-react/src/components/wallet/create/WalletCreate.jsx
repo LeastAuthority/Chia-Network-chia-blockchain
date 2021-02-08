@@ -35,8 +35,8 @@ import { CreateNewCCWallet } from './createNewColouredCoin';
 import { CreateExistingCCWallet } from './createExistingColouredCoin';
 import { CreateRLAdminWallet } from './createRLAdmin';
 import { CreateRLUserWallet } from './createRLUser';
-import { CreateDIDWallet } from '../../../pages/createDIDWallet';
-import { RecoverDIDWallet } from '../../../pages/recoverDIDWallet';
+import { CreateDIDWallet } from './createDIDWallet';
+import { RecoverDIDWallet } from './recoverDIDWallet';
 
 export const useStyles = makeStyles((theme) => ({
   walletContainer: {

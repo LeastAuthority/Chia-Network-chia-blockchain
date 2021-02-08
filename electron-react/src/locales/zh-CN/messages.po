@@ -309,7 +309,7 @@ msgstr "区块"
 msgid "BlocksCard.unfinished"
 msgstr ""
 
-#: src/components/wallet/create/WalletCreate.jsx:163
+#: src/components/wallet/create/WalletCreate.jsx:182
 msgid "CCListItems.title"
 msgstr "染色币选项"
 
@@ -728,9 +728,13 @@ msgstr "初始化受限的钱包："
 msgid "CreateRLUserWallet.title"
 msgstr "创建受限的钱包"
 
-#: src/components/wallet/Wallets.tsx:70
+#: src/components/wallet/Wallets.tsx:81
 msgid "CreateWallet.addWallet"
 msgstr "添加钱包"
+
+#: src/components/wallet/create/WalletCreate.jsx:310
+msgid "DIDListItems.title"
+msgstr ""
 
 #: src/components/dashboard/DashboardSideBar.tsx:26
 msgid "DashboardSideBar.farm"
@@ -1092,31 +1096,43 @@ msgstr "全节点状态"
 msgid "LocaleToggle.helpToTranslate"
 msgstr "帮助翻译"
 
-#: src/components/wallet/create/WalletCreate.jsx:115
+#: src/components/wallet/create/WalletCreate.jsx:124
 msgid "MainWalletList.colouredCoin"
 msgstr "染色币"
 
-#: src/components/wallet/create/WalletCreate.jsx:239
+#: src/components/wallet/create/WalletCreate.jsx:258
 msgid "MainWalletList.createAdminWallet"
 msgstr "创建管理员钱包"
 
-#: src/components/wallet/create/WalletCreate.jsx:175
+#: src/components/wallet/create/WalletCreate.jsx:322
+msgid "MainWalletList.createDIDWallet"
+msgstr ""
+
+#: src/components/wallet/create/WalletCreate.jsx:194
 msgid "MainWalletList.createNewColouredCoin"
 msgstr "创建新的染色币"
 
-#: src/components/wallet/create/WalletCreate.jsx:251
+#: src/components/wallet/create/WalletCreate.jsx:270
 msgid "MainWalletList.createUserWallet"
 msgstr "创建用户钱包"
 
-#: src/components/wallet/create/WalletCreate.jsx:187
+#: src/components/wallet/create/WalletCreate.jsx:206
 msgid "MainWalletList.createWalletForExistingColour"
 msgstr "为现有染色币创建钱包"
 
-#: src/components/wallet/create/WalletCreate.jsx:125
+#: src/components/wallet/create/WalletCreate.jsx:144
+msgid "MainWalletList.distributedIdentity"
+msgstr ""
+
+#: src/components/wallet/create/WalletCreate.jsx:134
 msgid "MainWalletList.rateLimited"
 msgstr "有限费率"
 
-#: src/components/wallet/create/WalletCreate.jsx:103
+#: src/components/wallet/create/WalletCreate.jsx:334
+msgid "MainWalletList.recoverDIDWallet"
+msgstr ""
+
+#: src/components/wallet/create/WalletCreate.jsx:112
 msgid "MainWalletList.title"
 msgstr "选择钱包类型"
 
@@ -1625,7 +1641,7 @@ msgstr "费率限制的信息"
 #~ msgid "RLHistoryCard.title"
 #~ msgstr "历史记录"
 
-#: src/components/wallet/create/WalletCreate.jsx:227
+#: src/components/wallet/create/WalletCreate.jsx:246
 msgid "RLListItems.title"
 msgstr "费率限制选项"
 
@@ -1821,15 +1837,15 @@ msgstr "发送"
 msgid "SendCard.title"
 msgstr "创建交易"
 
-#: src/components/wallet/Wallets.tsx:108
+#: src/components/wallet/Wallets.tsx:119
 msgid "StatusCard.connections"
 msgstr "连接："
 
-#: src/components/wallet/Wallets.tsx:102
+#: src/components/wallet/Wallets.tsx:113
 msgid "StatusCard.height"
 msgstr "高度："
 
-#: src/components/wallet/Wallets.tsx:87
+#: src/components/wallet/Wallets.tsx:98
 msgid "StatusCard.status"
 msgstr "状态："
 
@@ -1841,7 +1857,7 @@ msgstr "状态："
 #~ msgid "StatusCard.syncing"
 #~ msgstr "正在同步"
 
-#: src/components/wallet/Wallets.tsx:82
+#: src/components/wallet/Wallets.tsx:93
 msgid "StatusCard.title"
 msgstr "状态"
 
@@ -2183,15 +2199,19 @@ msgstr "下一步"
 msgid "WalletImport.title"
 msgstr "从助记词导入钱包"
 
-#: src/components/wallet/Wallets.tsx:33
+#: src/components/wallet/Wallets.tsx:34
 msgid "WalletItem.ccWallet"
 msgstr "CC 钱包"
 
-#: src/components/wallet/Wallets.tsx:29
+#: src/components/wallet/Wallets.tsx:30
 msgid "WalletItem.chiaWallet"
 msgstr "Chia 钱包"
 
-#: src/components/wallet/Wallets.tsx:40
+#: src/components/wallet/Wallets.tsx:48
+msgid "WalletItem.didWallet"
+msgstr ""
+
+#: src/components/wallet/Wallets.tsx:41
 msgid "WalletItem.rlWallet"
 msgstr "RL 钱包"
 
@@ -2203,7 +2223,7 @@ msgstr "连接："
 msgid "WalletStatusCard.height"
 msgstr "高度："
 
-#: src/components/wallet/Wallets.tsx:96
+#: src/components/wallet/Wallets.tsx:107
 msgid "WalletStatusCard.not_synced"
 msgstr ""
 
@@ -2212,12 +2232,12 @@ msgid "WalletStatusCard.status"
 msgstr "状态："
 
 #: src/components/wallet/WalletStatusCard.tsx:19
-#: src/components/wallet/Wallets.tsx:94
+#: src/components/wallet/Wallets.tsx:105
 msgid "WalletStatusCard.synced"
 msgstr "已同步"
 
 #: src/components/wallet/WalletStatusCard.tsx:19
-#: src/components/wallet/Wallets.tsx:92
+#: src/components/wallet/Wallets.tsx:103
 msgid "WalletStatusCard.syncing"
 msgstr "正在同步"
 
@@ -2225,7 +2245,7 @@ msgstr "正在同步"
 msgid "WalletStatusCard.title"
 msgstr "状态"
 
-#: src/components/wallet/Wallets.tsx:120
+#: src/components/wallet/Wallets.tsx:131
 msgid "Wallets.title"
 msgstr "钱包"
 

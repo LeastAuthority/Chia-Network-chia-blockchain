@@ -309,7 +309,7 @@ msgstr "Blocks"
 msgid "BlocksCard.unfinished"
 msgstr "Unfinished"
 
-#: src/components/wallet/create/WalletCreate.jsx:163
+#: src/components/wallet/create/WalletCreate.jsx:182
 msgid "CCListItems.title"
 msgstr "Coloured Coin Options"
 
@@ -728,9 +728,13 @@ msgstr "Initialize a Rate Limited User Wallet:"
 msgid "CreateRLUserWallet.title"
 msgstr "Create Rate Limited User Wallet"
 
-#: src/components/wallet/Wallets.tsx:70
+#: src/components/wallet/Wallets.tsx:81
 msgid "CreateWallet.addWallet"
 msgstr "Add Wallet"
+
+#: src/components/wallet/create/WalletCreate.jsx:310
+msgid "DIDListItems.title"
+msgstr "Distributed Identity Options"
 
 #: src/components/dashboard/DashboardSideBar.tsx:26
 msgid "DashboardSideBar.farm"
@@ -1092,31 +1096,43 @@ msgstr "Full Node Status"
 msgid "LocaleToggle.helpToTranslate"
 msgstr "Help to translate"
 
-#: src/components/wallet/create/WalletCreate.jsx:115
+#: src/components/wallet/create/WalletCreate.jsx:124
 msgid "MainWalletList.colouredCoin"
 msgstr "Coloured Coin"
 
-#: src/components/wallet/create/WalletCreate.jsx:239
+#: src/components/wallet/create/WalletCreate.jsx:258
 msgid "MainWalletList.createAdminWallet"
 msgstr "Create admin wallet"
 
-#: src/components/wallet/create/WalletCreate.jsx:175
+#: src/components/wallet/create/WalletCreate.jsx:322
+msgid "MainWalletList.createDIDWallet"
+msgstr "Create DID wallet"
+
+#: src/components/wallet/create/WalletCreate.jsx:194
 msgid "MainWalletList.createNewColouredCoin"
 msgstr "Create new coloured coin"
 
-#: src/components/wallet/create/WalletCreate.jsx:251
+#: src/components/wallet/create/WalletCreate.jsx:270
 msgid "MainWalletList.createUserWallet"
 msgstr "Create user wallet"
 
-#: src/components/wallet/create/WalletCreate.jsx:187
+#: src/components/wallet/create/WalletCreate.jsx:206
 msgid "MainWalletList.createWalletForExistingColour"
 msgstr "Create wallet for existing colour"
 
-#: src/components/wallet/create/WalletCreate.jsx:125
+#: src/components/wallet/create/WalletCreate.jsx:144
+msgid "MainWalletList.distributedIdentity"
+msgstr "Distributed Identity"
+
+#: src/components/wallet/create/WalletCreate.jsx:134
 msgid "MainWalletList.rateLimited"
 msgstr "Rate Limited"
 
-#: src/components/wallet/create/WalletCreate.jsx:103
+#: src/components/wallet/create/WalletCreate.jsx:334
+msgid "MainWalletList.recoverDIDWallet"
+msgstr "Recover DID wallet"
+
+#: src/components/wallet/create/WalletCreate.jsx:112
 msgid "MainWalletList.title"
 msgstr "Select Wallet Type"
 
@@ -1625,7 +1641,7 @@ msgstr "Rate Limited Info"
 #~ msgid "RLHistoryCard.title"
 #~ msgstr "History"
 
-#: src/components/wallet/create/WalletCreate.jsx:227
+#: src/components/wallet/create/WalletCreate.jsx:246
 msgid "RLListItems.title"
 msgstr "Rate Limited Options"
 
@@ -1821,15 +1837,15 @@ msgstr "Send"
 msgid "SendCard.title"
 msgstr "Create Transaction"
 
-#: src/components/wallet/Wallets.tsx:108
+#: src/components/wallet/Wallets.tsx:119
 msgid "StatusCard.connections"
 msgstr "connections:"
 
-#: src/components/wallet/Wallets.tsx:102
+#: src/components/wallet/Wallets.tsx:113
 msgid "StatusCard.height"
 msgstr "height:"
 
-#: src/components/wallet/Wallets.tsx:87
+#: src/components/wallet/Wallets.tsx:98
 msgid "StatusCard.status"
 msgstr "status:"
 
@@ -1841,7 +1857,7 @@ msgstr "status:"
 #~ msgid "StatusCard.syncing"
 #~ msgstr "syncing"
 
-#: src/components/wallet/Wallets.tsx:82
+#: src/components/wallet/Wallets.tsx:93
 msgid "StatusCard.title"
 msgstr "Status"
 
@@ -2183,15 +2199,19 @@ msgstr "Next"
 msgid "WalletImport.title"
 msgstr "Import Wallet from Mnemonics"
 
-#: src/components/wallet/Wallets.tsx:33
+#: src/components/wallet/Wallets.tsx:34
 msgid "WalletItem.ccWallet"
 msgstr "CC Wallet"
 
-#: src/components/wallet/Wallets.tsx:29
+#: src/components/wallet/Wallets.tsx:30
 msgid "WalletItem.chiaWallet"
 msgstr "Chia Wallet"
 
-#: src/components/wallet/Wallets.tsx:40
+#: src/components/wallet/Wallets.tsx:48
+msgid "WalletItem.didWallet"
+msgstr "DID Wallet"
+
+#: src/components/wallet/Wallets.tsx:41
 msgid "WalletItem.rlWallet"
 msgstr "RL Wallet"
 
@@ -2203,7 +2223,7 @@ msgstr "connections:"
 msgid "WalletStatusCard.height"
 msgstr "height:"
 
-#: src/components/wallet/Wallets.tsx:96
+#: src/components/wallet/Wallets.tsx:107
 msgid "WalletStatusCard.not_synced"
 msgstr "not synced"
 
@@ -2212,12 +2232,12 @@ msgid "WalletStatusCard.status"
 msgstr "status:"
 
 #: src/components/wallet/WalletStatusCard.tsx:19
-#: src/components/wallet/Wallets.tsx:94
+#: src/components/wallet/Wallets.tsx:105
 msgid "WalletStatusCard.synced"
 msgstr "synced"
 
 #: src/components/wallet/WalletStatusCard.tsx:19
-#: src/components/wallet/Wallets.tsx:92
+#: src/components/wallet/Wallets.tsx:103
 msgid "WalletStatusCard.syncing"
 msgstr "syncing"
 
@@ -2225,7 +2245,7 @@ msgstr "syncing"
 msgid "WalletStatusCard.title"
 msgstr "Status"
 
-#: src/components/wallet/Wallets.tsx:120
+#: src/components/wallet/Wallets.tsx:131
 msgid "Wallets.title"
 msgstr "Wallets"
 

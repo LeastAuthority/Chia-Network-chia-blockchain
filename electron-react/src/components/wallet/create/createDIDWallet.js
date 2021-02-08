@@ -13,13 +13,13 @@ import {
   createState,
   changeCreateWallet,
   CREATE_DID_WALLET_OPTIONS,
-} from '../modules/createWallet';
+} from '../../../modules/createWallet';
 import { useDispatch, useSelector } from 'react-redux';
 import ArrowBackIosIcon from '@material-ui/icons/ArrowBackIos';
-import { useStyles } from './useStyle';
-import { create_did_action } from '../modules/message';
-import { chia_to_mojo } from '../util/chia';
-import { openDialog } from '../modules/dialog';
+import { useStyles } from './WalletCreate';
+import { create_did_action } from '../../../modules/message';
+import { chia_to_mojo } from '../../../util/chia';
+import { openDialog } from '../../../modules/dialog';
 import { useForm, Controller, useFieldArray } from 'react-hook-form';
 
 export const customStyles = makeStyles((theme) => ({
