@@ -128,6 +128,6 @@ class TestCCWallet:
         await wallet.wallet_state_manager.main_wallet.push_transaction(tx)
 
         # Farm all the transactions
+        breakpoint()
         for i in range(1, num_blocks):
-            breakpoint()
             await full_node_api.farm_new_block(FarmNewBlockProtocol(ph))
