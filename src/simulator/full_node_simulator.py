@@ -57,6 +57,9 @@ class FullNodeSimulator(FullNodeAPI):
             bundle: Optional[SpendBundle] = await self.full_node.mempool_manager.create_bundle_from_mempool(
                 peak.header_hash
             )
+            if bundle is not None:
+                if len(bundle.coin_solutions) > 2:
+                    breakpoint()
             current_blocks = await self.get_all_full_blocks()
             target = request.puzzle_hash
             more = self.bt.get_consecutive_blocks(
