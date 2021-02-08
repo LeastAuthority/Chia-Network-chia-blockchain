@@ -30,8 +30,8 @@ export function getSubBlockRecords(end, count = 10) {
   return async (dispatch) => {
     let start = end - count;
     if (start < 0) {
-      start = 0
-    };
+      start = 0;
+    }
 
     const {
       data: { sub_block_records },

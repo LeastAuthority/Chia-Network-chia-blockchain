@@ -19,10 +19,12 @@ import {
   standardWallet,
   CCWallet,
   RLWallet,
+  DIDWallet
 } from '../../modules/walletMenu';
 import { CreateWalletView } from './create/WalletCreate';
 import ColouredWallet from './coloured/WalletColoured';
 import RateLimitedWallet from './rateLimited/WalletRateLimited';
+import DistributedWallet from '../../pages/DIDWallet';
 import type { RootState } from '../../modules/rootReducer';
 import WalletType from '../../constants/WalletType';
 import LayoutSidebar from '../layout/LayoutSidebar';
@@ -62,6 +64,12 @@ const WalletItem = (props: any) => {
       name = name.slice(0, 18);
       name = name.concat('...');
     }
+  } else if (wallet.type === WalletType.DISTRIBUTED_ID) {
+    mainLabel = <Trans id="WalletItem.didWallet">DID Wallet</Trans>;
+    if (name.length > 18) {
+      name = name.slice(0, 18);
+      name = name.concat('...');
+    }
   }
 
   function presentWallet() {
@@ -71,6 +79,8 @@ const WalletItem = (props: any) => {
       dispatch(changeWalletMenu(CCWallet, wallet.id));
     } else if (wallet.type === WalletType.RATE_LIMITED) {
       dispatch(changeWalletMenu(RLWallet, wallet.id));
+    } else if (wallet.type === WalletType.DISTRIBUTED_ID) {
+      dispatch(changeWalletMenu(DIDWallet, wallet.id));
     }
 
     history.push('/dashboard/wallets');
@@ -198,6 +208,10 @@ export default function Wallets() {
                 )}
                 {!!wallet && wallet.type === WalletType.RATE_LIMITED && (
                   <RateLimitedWallet wallet_id={id} />
+                )}
+                {!!wallet && wallet.type === WalletType.DISTRIBUTED_ID && (
+                  // @ts-ignore
+                  <DistributedWallet wallet_id={id} />
                 )}
               </Route>
               <Route path={`${path}/create`} exact>

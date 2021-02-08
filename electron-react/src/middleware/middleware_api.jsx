@@ -11,6 +11,8 @@ import {
   get_connection_info,
   get_colour_info,
   get_colour_name,
+  did_get_recovery_list,
+  did_get_did,
   pingWallet,
 } from '../modules/message';
 
@@ -52,6 +54,7 @@ import {
   COLOURED_COIN,
   STANDARD_WALLET,
   RATE_LIMITED,
+  DISTRIBUTED_ID,
 } from '../util/wallet_types';
 const config = require('../config/config');
 
@@ -261,6 +264,10 @@ export const handle_message = async (store, payload) => {
         if (wallet.type === COLOURED_COIN) {
           store.dispatch(get_colour_name(wallet.id));
           store.dispatch(get_colour_info(wallet.id));
+        }
+        if (wallet.type === DISTRIBUTED_ID) {
+          store.dispatch(did_get_recovery_list(wallet.id));
+          store.dispatch(did_get_did(wallet.id));
         }
       }
     }

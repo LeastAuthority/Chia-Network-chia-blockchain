@@ -27,11 +27,16 @@ import {
   CREATE_RL_WALLET_OPTIONS,
   CREATE_RL_ADMIN,
   CREATE_RL_USER,
+  CREATE_DID_WALLET_OPTIONS,
+  CREATE_DID_WALLET,
+  RECOVER_DID_WALLET
 } from '../../../modules/createWallet';
 import { CreateNewCCWallet } from './createNewColouredCoin';
 import { CreateExistingCCWallet } from './createExistingColouredCoin';
 import { CreateRLAdminWallet } from './createRLAdmin';
 import { CreateRLUserWallet } from './createRLUser';
+import { CreateDIDWallet } from '../../../pages/createDIDWallet';
+import { RecoverDIDWallet } from '../../../pages/recoverDIDWallet';
 
 export const useStyles = makeStyles((theme) => ({
   walletContainer: {
@@ -93,6 +98,10 @@ export const MainWalletList = () => {
     dispatch(changeCreateWallet(CREATE_RL_WALLET_OPTIONS));
   }
 
+  function select_option_did() {
+    dispatch(changeCreateWallet(CREATE_DID_WALLET_OPTIONS));
+  }
+
   return (
     <Grid container spacing={0}>
       <Grid item xs={12}>
@@ -123,6 +132,16 @@ export const MainWalletList = () => {
             <ListItemText
               primary={
                 <Trans id="MainWalletList.rateLimited">Rate Limited</Trans>
+              }
+            />
+          </ListItem>
+          <ListItem button onClick={select_option_did}>
+            <ListItemIcon>
+              <InvertColorsIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary={
+                <Trans id="MainWalletList.distributedIdentity">Distributed Identity</Trans>
               }
             />
           </ListItem>
@@ -260,6 +279,70 @@ export const RLListItems = () => {
   );
 };
 
+export const DIDListItems = () => {
+  const classes = useStyles();
+  const dispatch = useDispatch();
+
+  function goBack() {
+    dispatch(changeCreateWallet(ALL_OPTIONS));
+  }
+
+  function select_option_create() {
+    dispatch(changeCreateWallet(CREATE_DID_WALLET));
+  }
+
+  function select_option_recover() {
+    dispatch(changeCreateWallet(RECOVER_DID_WALLET));
+  }
+
+  return (
+    <Grid container spacing={0}>
+      <Grid item xs={12}>
+        <div className={classes.cardTitle}>
+          <Box display="flex">
+            <Box>
+              <Button onClick={goBack}>
+                <ArrowBackIosIcon />
+              </Button>
+            </Box>
+            <Box flexGrow={1} className={classes.title}>
+              <Typography component="h6" variant="h6">
+                <Trans id="DIDListItems.title">Distributed Identity Options</Trans>
+              </Typography>
+            </Box>
+          </Box>
+        </div>
+        <List>
+          <ListItem button onClick={select_option_create}>
+            <ListItemIcon>
+              <InvertColorsIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary={
+                <Trans id="MainWalletList.createDIDWallet">
+                  Create DID wallet
+                </Trans>
+              }
+            />
+          </ListItem>
+          <ListItem button onClick={select_option_recover}>
+            <ListItemIcon>
+              <InvertColorsIcon />
+            </ListItemIcon>
+            <ListItemText
+              primary={
+                <Trans id="MainWalletList.recoverDIDWallet">
+                  Recover DID wallet
+                </Trans>
+              }
+            />
+          </ListItem>
+        </List>
+      </Grid>
+    </Grid>
+  );
+};
+
 export function CreateWalletView() {
   const view = useSelector((state) => state.create_options.view);
 
@@ -273,6 +356,9 @@ export function CreateWalletView() {
         {view === CREATE_RL_WALLET_OPTIONS && <RLListItems />}
         {view === CREATE_RL_ADMIN && <CreateRLAdminWallet />}
         {view === CREATE_RL_USER && <CreateRLUserWallet />}
+        {view === CREATE_DID_WALLET_OPTIONS && <DIDListItems />}
+        {view === CREATE_DID_WALLET && <CreateDIDWallet />}
+        {view === RECOVER_DID_WALLET && <RecoverDIDWallet />}
       </CardContent>
     </Card>
   );
