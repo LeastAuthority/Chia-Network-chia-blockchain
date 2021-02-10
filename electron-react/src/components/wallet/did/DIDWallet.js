@@ -286,6 +286,17 @@ const RecoveryCard = (props) => {
   const classes = useStyles();
   const dispatch = useDispatch();
 
+  let recovery_files = [];
+
+  function handleSubmit(acceptedFiles) {
+    const offer_file_path = acceptedFiles[0].path;
+    const offer_name = offer_file_path.replace(/^.*[/\\]/, '');
+
+    dispatch(offerParsingName(offer_name, offer_file_path));
+    dispatch(parse_trade_action(offer_file_path));
+    dispatch(parsingStarted());
+  }
+
   return (
     <Paper className={classes.paper}>
       <Grid container spacing={0}>
@@ -329,6 +340,13 @@ const RecoveryCard = (props) => {
           backup_did_list={backup_did_list}
           dids_num_req={dids_num_req}
         />
+        <Grid item xs={12}>
+          <Dropzone onSubmit={handleSubmit}>
+            <Trans>
+              Drag and drop recovery files
+            </Trans>
+      </Dropzone>
+        </Grid>
       </Grid>
     </Paper>
   );
@@ -345,7 +363,6 @@ const MyDIDCard = (props) => {
 
   function generateBackup() {
     let filename = filename_input.value;
-    console.log(filename);
     dispatch(did_generate_backup_file(id, filename));
   }
 

@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
 import React, { useMemo } from 'react';
+import { Dropzone } from '@chia/core';
 import { Trans } from '@lingui/macro';
 import {
   Typography,
@@ -262,30 +263,17 @@ export const customStyles = makeStyles((theme) => ({
 export const RecoverDIDWallet = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const handleDragEnter = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-  const handleDragLeave = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-  const handleDragOver = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
-  const handleDrop = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
 
-    const recovery_file_path = e.dataTransfer.files[0].path;
+  function handleDrop(acceptedFiles) {
+    const recovery_file_path = acceptedFiles[0].path;
     const recovery_name = recovery_file_path.replace(/^.*[\\/]/, '');
-
     dispatch(recover_did_action(recovery_file_path));
   };
+
   function goBack() {
     dispatch(changeCreateWallet(CREATE_DID_WALLET_OPTIONS));
   }
+  
   return (
     <div>
       <div className={classes.cardTitle}>
@@ -302,20 +290,11 @@ export const RecoverDIDWallet = () => {
           </Box>
         </Box>
       </div>
-      <div
-        onDrop={(e) => handleDrop(e)}
-        onDragOver={(e) => handleDragOver(e)}
-        onDragEnter={(e) => handleDragEnter(e)}
-        onDragLeave={(e) => handleDragLeave(e)}
-      >
-        <Paper className={classes.drag} style={{ position: 'relative' }}>
-          <div className={classes.dragText}>
-            <Trans id="RecoverDIDDropView.dragAndDropOfferFile">
-              Drag and drop recovery file
-            </Trans>
-          </div>
-        </Paper>
-      </div>
+      <Dropzone onDrop={handleDrop}>
+        <Trans>
+          Drag and drop offer file
+        </Trans>
+      </Dropzone>
     </div>
   );
 };
