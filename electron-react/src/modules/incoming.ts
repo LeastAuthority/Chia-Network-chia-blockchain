@@ -249,7 +249,7 @@ export default function incomingReducer(
       } else if (command === 'did_get_did') {
         const id = data.wallet_id;
         const mydid = data.my_did;
-        const {coin_id} = data;
+        const { coin_id } = data;
         wallets = state.wallets;
         const wallet = wallets[Number.parseInt(id, 10)];
         if (!wallet) {

@@ -16,6 +16,7 @@ import TableRow from '@material-ui/core/TableRow';
 import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import { AlertDialog, Card, Flex, } from '@chia/core';
+import { Dropzone } from '@chia/core';
 
 import {
   did_generate_backup_file,
@@ -288,13 +289,18 @@ const RecoveryCard = (props) => {
 
   let recovery_files = [];
 
-  function handleSubmit(acceptedFiles) {
+  function handleDrop(acceptedFiles) {
+    if (acceptedFiles.length === 0) { return; }
+    console.log("FILE: ", acceptedFiles)
     const offer_file_path = acceptedFiles[0].path;
+    recovery_files.push(offer_file_path)
+    console.log("RECOVERY FILES", recovery_files)
+
     const offer_name = offer_file_path.replace(/^.*[/\\]/, '');
 
-    dispatch(offerParsingName(offer_name, offer_file_path));
-    dispatch(parse_trade_action(offer_file_path));
-    dispatch(parsingStarted());
+    // dispatch(offerParsingName(offer_name, offer_file_path));
+    // dispatch(parse_trade_action(offer_file_path));
+    // dispatch(parsingStarted());
   }
 
   return (
@@ -325,27 +331,30 @@ const RecoveryCard = (props) => {
             </Box>
           </div>
         </Grid>
-        <Grid item xs={12}>
-          <div className={classes.cardSubSection}>
-            <Box display="flex">
-              <Box flexGrow={1} style={{ marginBottom: 10 }}>
-                <Typography variant="subtitle1">
-                  Input Attest Packets:
-                </Typography>
-              </Box>
-            </Box>
-          </div>
-        </Grid>
         <ViewDIDsSubsection
           backup_did_list={backup_did_list}
           dids_num_req={dids_num_req}
         />
         <Grid item xs={12}>
-          <Dropzone onSubmit={handleSubmit}>
-            <Trans>
-              Drag and drop recovery files
-            </Trans>
-      </Dropzone>
+          <div className={classes.cardSubSection}>
+            <Box display="flex">
+              <Box flexGrow={1} style={{ marginBottom: 10, marginTop: 30 }}>
+                <Typography variant="subtitle1">
+                  Input Attestation Packets:
+                </Typography>
+              </Box>
+            </Box>
+          </div>
+        </Grid>
+        <Grid item xs={12}>
+          <Dropzone onDrop={handleDrop}>
+            {({ isDragActive, isDragReject, acceptedFiles, rejectedFiles }) => {
+              if (recovery_files.length === 0) {
+                return <p>Try dragging a file here!</p>
+              }
+              return recovery_files.map((file) => (file));
+            }}
+          </Dropzone>
         </Grid>
       </Grid>
     </Paper>

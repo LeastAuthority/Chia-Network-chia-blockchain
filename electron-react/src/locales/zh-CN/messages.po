@@ -796,6 +796,14 @@ msgstr ""
 msgid "DeleteKey.title"
 msgstr ""
 
+#: src/components/wallet/create/recoverDIDWallet.js:294
+msgid "Drag and drop offer file"
+msgstr ""
+
+#: src/components/wallet/did/DIDWallet.js:345
+msgid "Drag and drop recovery files"
+msgstr ""
+
 #: src/components/farm/overview/FarmOverview.tsx:13
 msgid "Farm.title"
 msgstr ""

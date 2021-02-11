@@ -796,6 +796,14 @@ msgstr "Deleting the key will permanently remove the key from your computer, mak
 msgid "DeleteKey.title"
 msgstr "Delete key"
 
+#: src/components/wallet/create/recoverDIDWallet.js:294
+msgid "Drag and drop offer file"
+msgstr "Drag and drop offer file"
+
+#: src/components/wallet/did/DIDWallet.js:345
+msgid "Drag and drop recovery files"
+msgstr "Drag and drop recovery files"
+
 #: src/components/farm/overview/FarmOverview.tsx:13
 msgid "Farm.title"
 msgstr "Your Farm Overview"
