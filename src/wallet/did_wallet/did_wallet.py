@@ -86,7 +86,6 @@ class DIDWallet:
         ).get_tree_hash()
 
         did_record = TransactionRecord(
-            confirmed_at_sub_height=uint32(0),
             confirmed_at_height=uint32(0),
             created_at_time=uint64(int(time.time())),
             to_puzzle_hash=did_puzzle_hash,
@@ -104,7 +103,6 @@ class DIDWallet:
             name=spend_bundle.name(),
         )
         regular_record = TransactionRecord(
-            confirmed_at_sub_height=uint32(0),
             confirmed_at_height=uint32(0),
             created_at_time=uint64(int(time.time())),
             to_puzzle_hash=did_puzzle_hash,
@@ -263,7 +261,7 @@ class DIDWallet:
             used_coins: Set = set()
 
             # Use older coins first
-            unspent.sort(key=lambda r: r.confirmed_block_index)
+            unspent.sort(key=lambda r: r.confirmed_block_height)
 
             # Try to use coins from the store, if there isn't enough of "unused"
             # coins use change coins that are not confirmed yet
@@ -291,7 +289,7 @@ class DIDWallet:
         return used_coins
 
     # This will be used in the recovery case where we don't have the parent info already
-    async def coin_added(self, coin: Coin, height: int, header_hash: bytes32, removals: List[Coin], sub_height: uint32):
+    async def coin_added(self, coin: Coin, header_hash: bytes32, removals: List[Coin], height: int):
         """ Notification from wallet state manager that wallet has been received. """
         self.log.info("DID wallet has been notified that coin was added")
         inner_puzzle = await self.inner_puzzle_for_did_puzzle(coin.puzzle_hash)
@@ -457,7 +455,6 @@ class DIDWallet:
         spend_bundle = SpendBundle(list_of_solutions, aggsig)
 
         did_record = TransactionRecord(
-            confirmed_at_sub_height=uint32(0),
             confirmed_at_height=uint32(0),
             created_at_time=uint64(int(time.time())),
             to_puzzle_hash=puzhash,
@@ -525,7 +522,6 @@ class DIDWallet:
         # assert signature.validate([signature.PkMessagePair(pubkey, message)])
         spend_bundle = SpendBundle(list_of_solutions, signature)
         did_record = TransactionRecord(
-            confirmed_at_sub_height=uint32(0),
             confirmed_at_height=uint32(0),
             created_at_time=uint64(int(time.time())),
             to_puzzle_hash=coin.puzzle_hash,
@@ -670,7 +666,6 @@ class DIDWallet:
             spend_bundle = spend_bundle.aggregate([spend_bundle, SpendBundle(list_of_solutions, aggsig)])
 
         did_record = TransactionRecord(
-            confirmed_at_sub_height=uint32(0),
             confirmed_at_height=uint32(0),
             created_at_time=uint64(int(time.time())),
             to_puzzle_hash=puzhash,

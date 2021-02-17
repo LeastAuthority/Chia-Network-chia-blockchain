@@ -74,8 +74,8 @@ class TestDIDWallet:
             ]
         )
 
-        await time_out_assert(10, wallet_0.get_confirmed_balance, funds)
         await time_out_assert(10, wallet_0.get_unconfirmed_balance, funds)
+        await time_out_assert(10, wallet_0.get_confirmed_balance, funds)
 
         # Wallet1 sets up DIDWallet1 without any backup set
         did_wallet_0: DIDWallet = await DIDWallet.create_new_did_wallet(
@@ -584,7 +584,6 @@ class TestDIDWallet:
         spend_bundle = SpendBundle(list_of_solutions, aggsig)
 
         did_record = TransactionRecord(
-            confirmed_at_sub_height=uint32(0),
             confirmed_at_height=uint32(0),
             created_at_time=uint64(int(time.time())),
             to_puzzle_hash=ph,
