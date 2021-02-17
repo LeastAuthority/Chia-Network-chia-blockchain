@@ -187,10 +187,11 @@ class DIDWallet:
     def id(self):
         return self.wallet_info.id
 
-    async def get_confirmed_balance(self) -> uint64:
-        record_list: Set[WalletCoinRecord] = await self.wallet_state_manager.coin_store.get_unspent_coins_for_wallet(
-            self.id()
-        )
+    async def get_confirmed_balance(self, unspent_records=None) -> uint64:
+        if unspent_records is None:
+            record_list: Set[WalletCoinRecord] = await self.wallet_state_manager.coin_store.get_unspent_coins_for_wallet(
+                self.id()
+            )
 
         amount: uint64 = uint64(0)
         for record in record_list:
@@ -221,8 +222,8 @@ class DIDWallet:
 
         return uint64(addition_amount)
 
-    async def get_unconfirmed_balance(self) -> uint64:
-        confirmed = await self.get_confirmed_balance()
+    async def get_unconfirmed_balance(self, record_list=None) -> uint64:
+        confirmed = await self.get_confirmed_balance(record_list)
         unconfirmed_tx: List[TransactionRecord] = await self.wallet_state_manager.tx_store.get_unconfirmed_for_wallet(
             self.wallet_info.id
         )
