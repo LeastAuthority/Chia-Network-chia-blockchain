@@ -185,14 +185,14 @@ class DIDWallet:
     def id(self):
         return self.wallet_info.id
 
-    async def get_confirmed_balance(self, unspent_records=None) -> uint64:
+    async def get_confirmed_balance(self, unspent_records: Set[WalletCoinRecord] = None) -> uint64:
         if unspent_records is None:
-            record_list: Set[WalletCoinRecord] = await self.wallet_state_manager.coin_store.get_unspent_coins_for_wallet(
+            unspent_records = await self.wallet_state_manager.coin_store.get_unspent_coins_for_wallet(
                 self.id()
             )
 
         amount: uint64 = uint64(0)
-        for record in record_list:
+        for record in unspent_records:
             parent = await self.get_parent_for_coin(record.coin)
             if parent is not None:
                 amount = uint64(amount + record.coin.amount)
@@ -350,7 +350,6 @@ class DIDWallet:
             full_nodes = self.wallet_state_manager.server.connection_by_type[NodeType.FULL_NODE]
             additions: Union[RespondAdditions, RejectAdditionsRequest, None] = None
             for id, node in full_nodes.items():
-                breakpoint()
                 request = wallet_protocol.RequestAdditions(sub_height, header_hash, None)
                 additions = await node.request_additions(request)
                 if additions is not None:
@@ -363,8 +362,7 @@ class DIDWallet:
             for puzzle_list_coin in additions.coins:
                 puzzle_hash, coins = puzzle_list_coin
                 for coin in coins:
-                    all_parents.add(coin.name())
-
+                    all_parents.add(coin.parent_coin_info)
             for puzzle_list_coin in additions.coins:
                 puzzle_hash, coins = puzzle_list_coin
                 if puzzle_hash == full_puzzle_hash:
@@ -372,24 +370,22 @@ class DIDWallet:
                     for coin in coins:
                         future_parent = CCParent(
                             coin.parent_coin_info,
-                            self.did_info.current_inner.get_tree_hash(),
+                            innerpuz.get_tree_hash(),
                             coin.amount,
                         )
                         await self.add_parent(coin.name(), future_parent)
                         if coin.name() in all_parents:
                             continue
                         did_info = DIDInfo(
-                            self.did_info.my_did,
-                            self.did_info.backup_ids,
-                            self.did_info.num_of_backup_ids_needed,
+                            genesis_id,
+                            backup_ids,
+                            num_of_backup_ids_needed,
                             self.did_info.parent_info,
-                            self.did_info.current_inner,
+                            innerpuz,
                             coin,
                         )
                         await self.save_info(did_info)
 
-            did_info = DIDInfo(genesis_id, backup_ids, num_of_backup_ids_needed, [], innerpuz, None)
-            await self.save_info(did_info)
             await self.wallet_state_manager.update_wallet_puzzle_hashes(self.wallet_info.id)
             return
         except Exception as e:

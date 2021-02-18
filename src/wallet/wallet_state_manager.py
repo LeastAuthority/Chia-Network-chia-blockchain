@@ -675,7 +675,6 @@ class WalletStateManager:
             coin, height, uint32(0), False, farm_reward, wallet_type, wallet_id
         )
         await self.coin_store.add_coin_record(coin_record)
-
         if wallet_type == WalletType.COLOURED_COIN or wallet_type == WalletType.DISTRIBUTED_ID:
             wallet: CCWallet = self.wallets[wallet_id]
             header_hash: bytes32 = self.blockchain.height_to_hash(height)
@@ -930,9 +929,9 @@ class WalletStateManager:
         )
         while peak_block is not None:
             tx_filter = PyBIP158([b for b in peak_block.header.transactions_filter])
-            if tx_filter.Match(bytearray(puzzlehash)) and peak_block.sub_block_height > heighest_block_height:
+            if tx_filter.Match(bytearray(puzzlehash)) and peak_block.height > heighest_block_height:
                 header_hash_of_interest = peak_block.header_hash
-                heighest_block_height = peak_block.sub_block_height
+                heighest_block_height = peak_block.height
                 break
             else:
                 peak_block = await self.blockchain.block_store.get_header_block_record(

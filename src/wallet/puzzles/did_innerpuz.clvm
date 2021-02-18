@@ -79,11 +79,11 @@
   ;recovery message module - gets values curried in to make the puzzle
   ;TODO - this should probably be imported
   (defun make_message_puzzle (recovering_coin newpuz pubkey)
-    (qq (r (c (q (unquote recovering_coin)) (q ((50 (unquote pubkey) (unquote newpuz)))))))
+    (qq (q ((60 (unquote recovering_coin)) (50 (unquote pubkey) (unquote newpuz)))))
   )
 
   (defun create_consume_message (coin_id my_id new_innerpuz pubkey)
-    (list OP_ASSERT_CONSUMED (sha256 coin_id (sha256tree1 (make_message_puzzle my_id new_innerpuz pubkey)) 0))
+    (list OP_ASSERT_CONSUMED (sha256 (sha256 coin_id (sha256tree1 (make_message_puzzle my_id new_innerpuz pubkey))) my_id))
   )
 
   ;; return the puzzle hash for a cc with the given `genesis-coin-checker-hash` & `inner-puzzle`
@@ -96,10 +96,6 @@
 
   (defun create_coin_ID_for_recovery (mod_hash mod_hash_hash did parent innerpuzhash amount)
     (sha256 parent (create_fullpuzhash mod_hash mod_hash_hash did innerpuzhash) amount)
-  )
-
-  (defmacro attest_to_id_and_newpuz (identity new_innerpuz)
-    (qq (c OP_CREATE_COIN (c (sha256tree1 (create_message (unquote identity) (unquote new_innerpuz))) (q (0)))))
   )
 
   (defmacro recreate_self (my_puzhash amount)
@@ -160,10 +156,6 @@
         )
       )
     )
-  )
-
-  (defun assert_consumed_identity identity
-    (list OP_ASSERT_CONSUMED identity)
   )
 
   ;Spend modes:
