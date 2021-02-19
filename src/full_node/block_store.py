@@ -18,6 +18,31 @@ class BlockStore:
     db: aiosqlite.Connection
     block_cache: LRUCache
 
+    # tablename: [(fieldname, type, Primary Key, index)]
+    tables = {
+        "full_blocks": [
+            ("header_hash", "text", True, None),
+            ("height", "bigint", False, "full_block_height"),
+            ("is_block", "tinyint", False, "is_block"),
+            ("block", "blob", False, None)
+        ],
+
+        "block_records": [
+            ("header_hash", "text", True, "hh"),
+            ("prev_hash", "text", False, None),
+            ("height", "bigint", False, "height"),
+            ("block", "blob", False, None),
+            ("sub_epoch_summary", "blob", False, None),
+            ("is_peak", "tinyint", False, "peak"),
+            ("is_block", "tinyint", False, "is_block")
+        ],
+
+        "sub_epoch_segments": [
+            ("ses_height", "bigint", True),
+            ("challenge_segments", "blob", False)
+        ],
+    }
+
     @classmethod
     async def create(cls, connection: aiosqlite.Connection):
         self = cls()
