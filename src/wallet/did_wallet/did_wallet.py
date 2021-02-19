@@ -187,9 +187,7 @@ class DIDWallet:
 
     async def get_confirmed_balance(self, unspent_records: Set[WalletCoinRecord] = None) -> uint64:
         if unspent_records is None:
-            unspent_records = await self.wallet_state_manager.coin_store.get_unspent_coins_for_wallet(
-                self.id()
-            )
+            unspent_records = await self.wallet_state_manager.coin_store.get_unspent_coins_for_wallet(self.id())
 
         amount: uint64 = uint64(0)
         for record in unspent_records:
