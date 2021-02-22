@@ -58,7 +58,7 @@ async def test_migration_steps_0(old_connection, new_connection):
         (std_hash(0), 0, 1, 0xcafef00d),
         (std_hash(1), 1, 0, 0xcafed00d),
         (std_hash(2), 2, 1, 0xfadeddab),
-        (std_hash(3), 0, 0, 0x12341234),
+        (std_hash(3), 3, 0, 0x12341234),
     ]
     cursor = await new_connection.executemany(
         "INSERT OR REPLACE INTO full_blocks VALUES(?, ?, ?, ?)",
