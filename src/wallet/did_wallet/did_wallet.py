@@ -344,7 +344,8 @@ class DIDWallet:
                 sub_height,
                 header_hash,
             ) = await self.wallet_state_manager.search_blockrecords_for_puzzlehash(full_puzzle_hash)
-
+            assert sub_height is not None
+            assert header_hash is not None
             full_nodes = self.wallet_state_manager.server.connection_by_type[NodeType.FULL_NODE]
             additions: Union[RespondAdditions, RejectAdditionsRequest, None] = None
             for id, node in full_nodes.items():
