@@ -185,12 +185,14 @@ class DIDWallet:
     def id(self):
         return self.wallet_info.id
 
-    async def get_confirmed_balance(self, unspent_records: Set[WalletCoinRecord] = None) -> uint64:
+    async def get_confirmed_balance(self, unspent_records=None) -> uint64:
         if unspent_records is None:
-            unspent_records = await self.wallet_state_manager.coin_store.get_unspent_coins_for_wallet(self.id())
+            record_list: Set[WalletCoinRecord] = await self.wallet_state_manager.coin_store.get_unspent_coins_for_wallet(
+                self.id()
+            )
 
         amount: uint64 = uint64(0)
-        for record in unspent_records:
+        for record in record_list:
             parent = await self.get_parent_for_coin(record.coin)
             if parent is not None:
                 amount = uint64(amount + record.coin.amount)
@@ -791,8 +793,10 @@ class DIDWallet:
     async def get_frozen_amount(self) -> uint64:
         return await self.wallet_state_manager.get_frozen_balance(self.wallet_info.id)
 
-    async def get_spendable_balance(self) -> uint64:
-        spendable_am = await self.wallet_state_manager.get_confirmed_spendable_balance_for_wallet(self.wallet_info.id)
+    async def get_spendable_balance(self, unspent_records=None) -> uint64:
+        spendable_am = await self.wallet_state_manager.get_confirmed_spendable_balance_for_wallet(
+            self.wallet_info.id, unspent_records
+        )
         return spendable_am
 
     async def add_parent(self, name: bytes32, parent: Optional[CCParent]):
