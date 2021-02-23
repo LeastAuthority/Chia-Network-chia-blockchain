@@ -20,6 +20,7 @@ from src.util.config import (
     initial_config_file,
 )
 from src.util.path import mkdir
+from src.util.migration_rules import migrate as db_migrate
 import yaml
 
 from src.ssl.create_ssl import get_chia_ca_crt_key, generate_ca_signed_cert, make_ca_cert
@@ -384,6 +385,7 @@ def chia_init(root_path: Path):
     # Version 19 is the first version that used the bech32m addresses
     for version_number in range(chia_minor_release_number() - 1, 18, -1):
         old_path = Path(os.path.expanduser("~/.chia/beta-1.0b%s" % version_number))
+        await db_migrate(old_path, root_path)
         manifest = MANIFEST
         print(f"Checking {old_path}")
         # This is reached if the user has updated the application, and therefore a new configuration

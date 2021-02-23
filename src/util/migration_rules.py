@@ -2,7 +2,7 @@ from typing import Dict, List, Callable
 import aiosqlite
 from src.util.hash import std_hash
 import copy
-
+from os import listdir
 
 # backwards migration not supported
 # list of python functions for transforming the previous SQL DB to the next version
@@ -200,14 +200,18 @@ async def create_tables_from_schemadict(connection, schema):
     return
 
 
-async def migrate(folder, current_chia_version):
+async def migrate(old_folder, new_folder):
+    current_chia_version = None
+    for f in listdir(f"{old_folder}/db"):
+        if f[0:11] == "blockchain_v":
+            current_chia_version = int(f.split("_")[1][1:])
     for mig in MIGRATION_UPDATES:
         if mig.version < current_chia_version:
             continue
-        connection = await aiosqlite.connect(f"{folder}/db_{mig.version}.db")
+        connection = await aiosqlite.connect(f"{new_folder}/blockchain_v{mig.version}.db")
         await create_tables_from_schemadict(connection, mig.schema)
-        if current_chia_version >= 0:
-            old_connection = await aiosqlite.connect(f"{folder}/db_{current_chia_version}.db")
+        if current_chia_version is not None:
+            old_connection = await aiosqlite.connect(f"{old_folder}/blockchain_v{current_chia_version}.db")
         else:
             old_connection = None
         await mig.migration_steps(old_connection, connection)
