@@ -26,6 +26,7 @@ from src.util.ints import uint32, uint64, uint128
 from src.util.hash import std_hash
 from src.wallet.block_record import HeaderBlockRecord
 from src.wallet.cc_wallet.cc_wallet import CCWallet
+from src.wallet.did_wallet.did_wallet import DIDWallet
 from src.wallet.key_val_store import KeyValStore
 from src.wallet.settings.user_settings import UserSettings
 from src.wallet.rl_wallet.rl_wallet import RLWallet
@@ -165,6 +166,12 @@ class WalletStateManager:
             elif wallet_info.type == WalletType.RATE_LIMITED:
                 wallet = await RLWallet.create(self, wallet_info)
                 self.wallets[wallet_info.id] = wallet
+            elif wallet_info.type == WalletType.DISTRIBUTED_ID:
+                wallet = await DIDWallet.create(
+                    self,
+                    self.main_wallet,
+                    wallet_info,
+                )
 
         async with self.puzzle_store.lock:
             index = await self.puzzle_store.get_last_derivation_path()
@@ -200,6 +207,13 @@ class WalletStateManager:
             # TODO add RL AND DiD WALLETS HERE
             elif wallet_info.type == WalletType.COLOURED_COIN:
                 wallet = await CCWallet.create(
+                    self,
+                    self.main_wallet,
+                    wallet_info,
+                )
+                self.wallets[wallet_info.id] = wallet
+            elif wallet_info.type == WalletType.DISTRIBUTED_ID:
+                wallet = await DIDWallet.create(
                     self,
                     self.main_wallet,
                     wallet_info,
