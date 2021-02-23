@@ -11,10 +11,17 @@ import pkg_resources
 from bitstring import BitArray
 from blspy import AugSchemeMPL, G1Element, PrivateKey
 from keyrings.cryptfile.cryptfile import CryptFileKeyring
+from keyrings.cryptfile.file import PlaintextKeyring
+from Crypto.Cipher import AES
+from Crypto import Random
 from src.util.hash import std_hash
+from getpass import getpass
+from pbkdf2 import PBKDF2
+from os import urandom
 
 
 MAX_KEYS = 100
+PBKDF2_TERATIONS = 10000
 
 if platform == "win32" or platform == "cygwin":
     import keyring.backends.Windows
@@ -25,8 +32,32 @@ elif platform == "darwin":
 
     keyring.set_keyring(keyring.backends.OS_X.Keyring())
 elif platform == "linux":
+    plaintext_keyring = PlaintextKeyring()
+    if plaintext_keyring.get_password("system", "salt") is None:
+        password = getpass('Choose a secure password to protect your keys: ')
+        salt = urandom(16)
+        plaintext_keyring.set_password("system", "salt", salt.hex())
+        key = PBKDF2(password, salt, PBKDF2_TERATIONS).read(32)
+        iv = Random.new().read(AES.block_size)
+        plaintext_keyring.set_password("system", "iv", iv.hex())
+        cipher = AES.new(key, AES.MODE_CBC, iv)
+        encrypted_salt = cipher.encrypt(salt)
+        plaintext_keyring.set_password("system", "encrypted_salt", encrypted_salt.hex())
+    salt = bytes.fromhex(plaintext_keyring.get_password("system", "salt"))
+    encrypted_salt = bytes.fromhex(plaintext_keyring.get_password("system", "encrypted_salt"))
+    iv = bytes.fromhex(plaintext_keyring.get_password("system", "iv"))
+    while True:
+        password = getpass('Enter your password to unlock the keyring: ')
+        key = PBKDF2(password, salt, PBKDF2_TERATIONS).read(32)
+        cipher = AES.new(key, AES.MODE_CBC, iv)
+        test_encrypted_salt = cipher.encrypt(salt)
+        if test_encrypted_salt != encrypted_salt:
+            print('Incorrect password')
+        else:
+            break
+    key = PBKDF2(password, salt, PBKDF2_TERATIONS).read(32)
     keyring = CryptFileKeyring()
-    keyring.keyring_key = "your keyring password"
+    keyring.keyring_key = key.hex()
 else:
     keyring = keyring_main
 
