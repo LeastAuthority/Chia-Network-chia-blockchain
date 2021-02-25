@@ -204,3 +204,14 @@ class TestMigrations:
         await connection.close()
         assert row[1] == 5
         assert row[4] == "test"
+
+        # Test migration back to old_temp using copy feature
+        delete_temp_folder(f"{old_folder}/db")
+        assert count_files_in_folder(f"{old_folder}/db") == 0
+        await migrate(new_folder, old_folder, fake_migration_updates)
+        connection = await aiosqlite.connect(f"{old_folder}/db/blockchain_v3.db")
+        cursor = await connection.execute('SELECT * FROM full_blocks')
+        row = await cursor.fetchone()
+        await connection.close()
+        assert row[1] == 5
+        assert row[4] == "test"
