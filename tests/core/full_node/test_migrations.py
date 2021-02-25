@@ -8,39 +8,24 @@ from src.util.migration_rules import (
     Migration
 )
 from src.util.hash import std_hash
-import copy
 from typing import List
 import aiosqlite
 
 
 # tablename: [(fieldname, type, Primary Key, index)]
-DEFAULT_TABLES = {
-    "full_blocks": [
-        ("header_hash", "text", True, None),
-        ("height", "bigint", False, "full_block_height"),
-        ("is_block", "tinyint", False, "is_block"),
-        ("block", "blob", False, None)
-    ],
+DEFAULT_TABLES = [
+    "CREATE TABLE full_blocks(header_hash text PRIMARY KEY, height bigint, is_block tinyint, block bloba)",
+    "CREATE TABLE block_records(header_hash text PRIMARY KEY, prev_hash text, height bigint, block blob, sub_epoch_summary blob, is_peak tinyint, is_block tinyint)",
+    "CREATE TABLE sub_epoch_segments(ses_height bigint PRIMARY KEY, challenge_segments blob)",
+    "CREATE INDEX full_block_height on full_blocks(height)",
+    "CREATE INDEX is_block on full_blocks(is_block)",
+    "CREATE INDEX hh on block_records(header_hash)",
+    "CREATE INDEX height on block_records(height)",
+    "CREATE INDEX peak on block_records(is_peak)",
+]
 
-    "block_records": [
-        ("header_hash", "text", True, "hh"),
-        ("prev_hash", "text", False, None),
-        ("height", "bigint", False, "height"),
-        ("block", "blob", False, None),
-        ("sub_epoch_summary", "blob", False, None),
-        ("is_peak", "tinyint", False, "peak"),
-        ("is_block", "tinyint", False, "is_block")
-    ],
-
-    "sub_epoch_segments": [
-        ("ses_height", "bigint", True, None),
-        ("challenge_segments", "blob", False, None)
-    ],
-}
-
-MODIFIED_TABLES = copy.deepcopy(DEFAULT_TABLES)
-MODIFIED_TABLES["full_blocks"].append(("names", "text", False, None))
-MODIFIED_TABLES["sub_epoch_segments"][0] = ("ses_height", "bigint", True, "height")
+MODIFIED_TABLES = DEFAULT_TABLES.copy()
+MODIFIED_TABLES[0] = "CREATE TABLE full_blocks(header_hash text PRIMARY KEY, height bigint, is_block tinyint, block blob, names text)"
 
 
 async def fake_migration_steps_0(old_connection, new_connection):
@@ -132,7 +117,6 @@ async def fake_migration_steps_1(old_connection, new_connection):
 
 
 async def fake_migration_steps_2(old_connection, new_connection):
-    # add index for ses_height
     # add new column to full_blocks, populate it with placeholder info for old data
     cursor = await old_connection.execute('SELECT * FROM full_blocks')
     rows = await cursor.fetchall()
@@ -212,5 +196,11 @@ class TestMigrations:
         await create_tables_from_schemadict(connection, DEFAULT_TABLES)
         await connection.close()
         await migrate(old_folder, new_folder, fake_migration_updates)
-        assert count_files_in_folder(f"{new_folder}/db") == 3
+        assert count_files_in_folder(f"{new_folder}/db") == 1
         # TODO: check that the final version has undergone all transformations
+        connection = await aiosqlite.connect(f"{new_folder}/db/blockchain_v3.db")
+        cursor = await connection.execute('SELECT * FROM full_blocks')
+        row = await cursor.fetchone()
+        await connection.close()
+        assert row[1] == 5
+        assert row[4] == "test"

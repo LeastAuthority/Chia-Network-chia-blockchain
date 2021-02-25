@@ -1,6 +1,6 @@
 from typing import Dict, List, Callable
 import aiosqlite
-from os import listdir
+from os import listdir, unlink
 
 # backwards migration not supported
 # list of python functions for transforming the previous SQL DB to the next version
@@ -11,8 +11,8 @@ from os import listdir
 
 class Migration():
     version: int
-    schema: Dict
-    migration_steps: List[Callable]
+    schema: List[str]  # List of strings
+    migration_steps: Callable
 
     def __init__(self, vers, sch, mig_steps):
         self.version = vers
@@ -21,23 +21,8 @@ class Migration():
 
 
 async def create_tables_from_schemadict(connection, schema):
-    index_creations = []
-    for tablename, values in schema.items():
-        params = f"CREATE TABLE IF NOT EXISTS {tablename}("
-        for tuple in values:
-            params = params + f"{tuple[0]} {tuple[1]}"
-            if tuple[2]:
-                params = params + " PRIMARY KEY"
-            if tuple[3] is not None:
-                # full_block_height on full_blocks(height)
-                index_creations.append(f"{tuple[3]} on {tablename}({tuple[0]})")
-            params = params + ", "
-        params = params[:-2] + ")"
-        await connection.execute(
-            params
-        )
-    for creation in index_creations:
-        await connection.execute(f"CREATE INDEX IF NOT EXISTS {creation}")
+    for command in schema:
+        await connection.execute(command)
     await connection.commit()
     return
 
@@ -63,4 +48,7 @@ async def migrate(old_folder, new_folder, MIGRATION_UPDATES_LIST):
             await old_connection.close()
         current_chia_version = mig.version
         old_folder = new_folder
+    for f in listdir(f"{old_folder}/db"):
+        if f[0:12] == "blockchain_v" and int(f.split("_")[1][1:-3]) != mig.version:
+            unlink(f"{old_folder}/db/{f}")
     return
