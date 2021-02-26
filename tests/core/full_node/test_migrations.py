@@ -17,6 +17,7 @@ DEFAULT_TABLES = [
     "CREATE TABLE full_blocks(header_hash text PRIMARY KEY, height bigint, is_block tinyint, block bloba)",
     "CREATE TABLE block_records(header_hash text PRIMARY KEY, prev_hash text, height bigint, block blob, sub_epoch_summary blob, is_peak tinyint, is_block tinyint)",
     "CREATE TABLE sub_epoch_segments(ses_height bigint PRIMARY KEY, challenge_segments blob)",
+    "CREATE TABLE schema_version(version_key text PRIMARY KEY, version_number bigint)",
     "CREATE INDEX full_block_height on full_blocks(height)",
     "CREATE INDEX is_block on full_blocks(is_block)",
     "CREATE INDEX hh on block_records(header_hash)",
@@ -144,7 +145,6 @@ async def fake_migration_steps_2(old_connection, new_connection):
 
     await cursor.close()
     await new_connection.commit()
-
     return
 
 mig_0 = Migration(1, DEFAULT_TABLES, fake_migration_steps_0)
@@ -186,19 +186,19 @@ class TestMigrations:
     async def test_migration(self):
         old_folder = "tests/util/old_temp"
         new_folder = "tests/util/new_temp"
+        genesis_block_str = std_hash(0xdeadb33f).hex()
 
         delete_temp_folder(f"{new_folder}/db")
         assert count_files_in_folder(f"{new_folder}/db") == 0
         delete_temp_folder(f"{old_folder}/db")
         assert count_files_in_folder(f"{old_folder}/db") == 0
 
-        connection = await aiosqlite.connect(f"{old_folder}/db/blockchain_v0.db")
-        await create_tables_from_schemadict(connection, DEFAULT_TABLES)
+        connection = await aiosqlite.connect(f"{old_folder}/db/blockchain_v0_{genesis_block_str}.sqlite")
+        await create_tables_from_schemadict(connection, DEFAULT_TABLES, 0)
         await connection.close()
         await migrate(old_folder, new_folder, fake_migration_updates)
         assert count_files_in_folder(f"{new_folder}/db") == 1
-        # TODO: check that the final version has undergone all transformations
-        connection = await aiosqlite.connect(f"{new_folder}/db/blockchain_v3.db")
+        connection = await aiosqlite.connect(f"{new_folder}/db/blockchain_v3_{genesis_block_str}.sqlite")
         cursor = await connection.execute('SELECT * FROM full_blocks')
         row = await cursor.fetchone()
         await connection.close()
@@ -209,9 +209,13 @@ class TestMigrations:
         delete_temp_folder(f"{old_folder}/db")
         assert count_files_in_folder(f"{old_folder}/db") == 0
         await migrate(new_folder, old_folder, fake_migration_updates)
-        connection = await aiosqlite.connect(f"{old_folder}/db/blockchain_v3.db")
+
+        connection = await aiosqlite.connect(f"{old_folder}/db/blockchain_v3_{genesis_block_str}.sqlite")
         cursor = await connection.execute('SELECT * FROM full_blocks')
         row = await cursor.fetchone()
-        await connection.close()
         assert row[1] == 5
         assert row[4] == "test"
+        cursor = await connection.execute('SELECT * FROM schema_version')
+        row = await cursor.fetchone()
+        assert row[1] == 3
+        await connection.close()

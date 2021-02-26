@@ -83,6 +83,10 @@ vdf_bench
 # Compiled CLVM
 main.sym
 
+# Test sqlite dbs
+tests/util/new_temp/db/*
+tests/util/old_temp/db/*
+
 # Dev config react
 # chia-blockchain-gui/src/dev_config.js
 # React built app
