@@ -2,11 +2,7 @@ import pytest
 import asyncio
 import os
 import shutil
-from src.util.migration_rules import (
-    create_tables_from_schemadict,
-    migrate,
-    Migration
-)
+from src.util.migration_rules import create_tables_from_schemadict, migrate, Migration
 from src.util.hash import std_hash
 from typing import List
 import aiosqlite
@@ -15,7 +11,7 @@ import aiosqlite
 # tablename: [(fieldname, type, Primary Key, index)]
 DEFAULT_TABLES = [
     "CREATE TABLE full_blocks(header_hash text PRIMARY KEY, height bigint, is_block tinyint, block bloba)",
-    "CREATE TABLE block_records(header_hash text PRIMARY KEY, prev_hash text, height bigint, block blob, sub_epoch_summary blob, is_peak tinyint, is_block tinyint)",
+    "CREATE TABLE block_records(header_hash text PRIMARY KEY, prev_hash text, height bigint, block blob, sub_epoch_summary blob, is_peak tinyint, is_block tinyint)",  # noqa
     "CREATE TABLE sub_epoch_segments(ses_height bigint PRIMARY KEY, challenge_segments blob)",
     "CREATE TABLE schema_version(version_key text PRIMARY KEY, version_number bigint)",
     "CREATE INDEX full_block_height on full_blocks(height)",
@@ -26,15 +22,17 @@ DEFAULT_TABLES = [
 ]
 
 MODIFIED_TABLES = DEFAULT_TABLES.copy()
-MODIFIED_TABLES[0] = "CREATE TABLE full_blocks(header_hash text PRIMARY KEY, height bigint, is_block tinyint, block blob, names text)"
+MODIFIED_TABLES[
+    0
+] = "CREATE TABLE full_blocks(header_hash text PRIMARY KEY, height bigint, is_block tinyint, block blob, names text)"
 
 
 async def fake_migration_steps_0(old_connection, new_connection):
     # populate table with data for test purposes
     sql_records = [
-        (std_hash(0), 0, 1, 0xcafef00d),
-        (std_hash(1), 1, 0, 0xcafed00d),
-        (std_hash(2), 2, 1, 0xfadeddab),
+        (std_hash(0), 0, 1, 0xCAFEF00D),
+        (std_hash(1), 1, 0, 0xCAFED00D),
+        (std_hash(2), 2, 1, 0xFADEDDAB),
         (std_hash(3), 3, 0, 0x12341234),
     ]
     cursor = await new_connection.executemany(
@@ -46,9 +44,9 @@ async def fake_migration_steps_0(old_connection, new_connection):
     await new_connection.commit()
 
     sql_records = [
-        (std_hash(0), std_hash(0xdeadb33f), 0, 0xcafef00d, None, 0, 1),
-        (std_hash(1), std_hash(0), 1, 0xcafed00d, None, 0, 0),
-        (std_hash(2), std_hash(1), 2, 0xfadeddab, None, 0, 1),
+        (std_hash(0), std_hash(0xDEADB33F), 0, 0xCAFEF00D, None, 0, 1),
+        (std_hash(1), std_hash(0), 1, 0xCAFED00D, None, 0, 0),
+        (std_hash(2), std_hash(1), 2, 0xFADEDDAB, None, 0, 1),
         (std_hash(3), std_hash(2), 3, 0x12341234, None, 1, 1),
     ]
     cursor = await new_connection.executemany(
@@ -60,8 +58,8 @@ async def fake_migration_steps_0(old_connection, new_connection):
     await new_connection.commit()
 
     sql_records = [
-        (0, 0xdeadbeef),
-        (3, 0xd3adb33f),
+        (0, 0xDEADBEEF),
+        (3, 0xD3ADB33F),
     ]
     cursor = await new_connection.executemany(
         "INSERT OR REPLACE INTO sub_epoch_segments VALUES(?, ?)",
@@ -75,7 +73,7 @@ async def fake_migration_steps_0(old_connection, new_connection):
 
 async def fake_migration_steps_1(old_connection, new_connection):
     # all heights +5 - incase we decide to start indexing from 1 :^)
-    cursor = await old_connection.execute('SELECT * FROM full_blocks')
+    cursor = await old_connection.execute("SELECT * FROM full_blocks")
     rows = await cursor.fetchall()
     sql_records = []
     for row in rows:
@@ -96,7 +94,7 @@ async def fake_migration_steps_1(old_connection, new_connection):
 
     await cursor.close()
     await new_connection.commit()
-    cursor = await old_connection.execute('SELECT * FROM block_records')
+    cursor = await old_connection.execute("SELECT * FROM block_records")
     rows = await cursor.fetchall()
     cursor = await new_connection.executemany(
         "INSERT OR REPLACE INTO block_records VALUES(?, ?, ?, ?, ?, ?, ?)",
@@ -105,7 +103,7 @@ async def fake_migration_steps_1(old_connection, new_connection):
 
     await cursor.close()
     await new_connection.commit()
-    cursor = await old_connection.execute('SELECT * FROM sub_epoch_segments')
+    cursor = await old_connection.execute("SELECT * FROM sub_epoch_segments")
     rows = await cursor.fetchall()
     cursor = await new_connection.executemany(
         "INSERT OR REPLACE INTO sub_epoch_segments VALUES(?, ?)",
@@ -119,15 +117,15 @@ async def fake_migration_steps_1(old_connection, new_connection):
 
 async def fake_migration_steps_2(old_connection, new_connection):
     # add new column to full_blocks, populate it with placeholder info for old data
-    cursor = await old_connection.execute('SELECT * FROM full_blocks')
+    cursor = await old_connection.execute("SELECT * FROM full_blocks")
     rows = await cursor.fetchall()
     cursor = await new_connection.executemany(
-        "INSERT OR REPLACE INTO full_blocks VALUES(?, ?, ?, ?, \"test\")",
+        'INSERT OR REPLACE INTO full_blocks VALUES(?, ?, ?, ?, "test")',
         rows,
     )
     await cursor.close()
     await new_connection.commit()
-    cursor = await old_connection.execute('SELECT * FROM block_records')
+    cursor = await old_connection.execute("SELECT * FROM block_records")
     rows = await cursor.fetchall()
     cursor = await new_connection.executemany(
         "INSERT OR REPLACE INTO block_records VALUES(?, ?, ?, ?, ?, ?, ?)",
@@ -136,7 +134,7 @@ async def fake_migration_steps_2(old_connection, new_connection):
 
     await cursor.close()
     await new_connection.commit()
-    cursor = await old_connection.execute('SELECT * FROM sub_epoch_segments')
+    cursor = await old_connection.execute("SELECT * FROM sub_epoch_segments")
     rows = await cursor.fetchall()
     cursor = await new_connection.executemany(
         "INSERT OR REPLACE INTO sub_epoch_segments VALUES(?, ?)",
@@ -146,6 +144,7 @@ async def fake_migration_steps_2(old_connection, new_connection):
     await cursor.close()
     await new_connection.commit()
     return
+
 
 mig_0 = Migration(1, DEFAULT_TABLES, fake_migration_steps_0)
 mig_1 = Migration(2, DEFAULT_TABLES, fake_migration_steps_1)
@@ -178,7 +177,7 @@ def delete_temp_folder(folder):
             elif os.path.isdir(file_path):
                 shutil.rmtree(file_path)
         except Exception as e:
-            print('Failed to delete %s. Reason: %s' % (file_path, e))
+            print("Failed to delete %s. Reason: %s" % (file_path, e))
 
 
 class TestMigrations:
@@ -186,7 +185,7 @@ class TestMigrations:
     async def test_migration(self):
         old_folder = "tests/util/old_temp"
         new_folder = "tests/util/new_temp"
-        genesis_block_str = std_hash(0xdeadb33f).hex()
+        genesis_block_str = std_hash(0xDEADB33F).hex()
 
         delete_temp_folder(f"{new_folder}/db")
         assert count_files_in_folder(f"{new_folder}/db") == 0
@@ -199,7 +198,7 @@ class TestMigrations:
         await migrate(old_folder, new_folder, fake_migration_updates)
         assert count_files_in_folder(f"{new_folder}/db") == 1
         connection = await aiosqlite.connect(f"{new_folder}/db/blockchain_v3_{genesis_block_str}.sqlite")
-        cursor = await connection.execute('SELECT * FROM full_blocks')
+        cursor = await connection.execute("SELECT * FROM full_blocks")
         row = await cursor.fetchone()
         await connection.close()
         assert row[1] == 5
@@ -211,11 +210,11 @@ class TestMigrations:
         await migrate(new_folder, old_folder, fake_migration_updates)
 
         connection = await aiosqlite.connect(f"{old_folder}/db/blockchain_v3_{genesis_block_str}.sqlite")
-        cursor = await connection.execute('SELECT * FROM full_blocks')
+        cursor = await connection.execute("SELECT * FROM full_blocks")
         row = await cursor.fetchone()
         assert row[1] == 5
         assert row[4] == "test"
-        cursor = await connection.execute('SELECT * FROM schema_version')
+        cursor = await connection.execute("SELECT * FROM schema_version")
         row = await cursor.fetchone()
         assert row[1] == 3
         await connection.close()

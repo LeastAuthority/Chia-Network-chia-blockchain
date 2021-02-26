@@ -1,7 +1,7 @@
 from src import __version__
 import os
 import shutil
-
+import asyncio
 from argparse import Namespace, ArgumentParser
 from typing import List, Dict, Any, Tuple
 
@@ -21,7 +21,7 @@ from src.util.config import (
 )
 from src.util.path import mkdir
 from src.util.migration_rules import migrate as db_migrate
-from src.util.migration_rules_list import MIGRATION_RULES
+from src.util.migration_rule_list import MIGRATION_RULES
 import yaml
 
 from src.ssl.create_ssl import get_chia_ca_crt_key, generate_ca_signed_cert, make_ca_cert
@@ -387,7 +387,9 @@ def chia_init(root_path: Path):
     for version_number in range(chia_minor_release_number() - 1, 18, -1):
         old_path = Path(os.path.expanduser("~/.chia/beta-1.0b%s" % version_number))
         # This does not migrate dev folders
-        await db_migrate(old_path, root_path, MIGRATION_RULES)
+        loop = asyncio.get_event_loop()
+
+        loop.run_until_complete(db_migrate(old_path, root_path, MIGRATION_RULES))
         manifest = MANIFEST
         print(f"Checking {old_path}")
         # This is reached if the user has updated the application, and therefore a new configuration

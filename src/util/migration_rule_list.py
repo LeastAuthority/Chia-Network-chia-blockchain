@@ -3,7 +3,7 @@ from typing import List
 
 schema_0 = [
     "CREATE TABLE full_blocks(header_hash text PRIMARY KEY, height bigint,  is_block tinyint, block blob)",
-    "CREATE TABLE block_records(header_hash text PRIMARY KEY, prev_hash text, height bigint,block blob, sub_epoch_summary blob, is_peak tinyint, is_block tinyint)",
+    "CREATE TABLE block_records(header_hash text PRIMARY KEY, prev_hash text, height bigint,block blob, sub_epoch_summary blob, is_peak tinyint, is_block tinyint)",  # noqa
     "CREATE TABLE sub_epoch_segments(ses_height bigint PRIMARY KEY, challenge_segments blob)",
     "CREATE TABLE schema_version(version bigint PRIMARY KEY)",
     "CREATE INDEX full_block_height on full_blocks(height)",
@@ -11,7 +11,7 @@ schema_0 = [
     "CREATE INDEX height on block_records(height)",
     "CREATE INDEX hh on block_records(header_hash)",
     "CREATE INDEX peak on block_records(is_peak)",
-    "CREATE TABLE coin_record(coin_name text PRIMARY KEY, confirmed_index bigint, spent_index bigint, spent int, coinbase int, puzzle_hash text, coin_parent text, amount blob, timestamp bigint)",
+    "CREATE TABLE coin_record(coin_name text PRIMARY KEY, confirmed_index bigint, spent_index bigint, spent int, coinbase int, puzzle_hash text, coin_parent text, amount blob, timestamp bigint)",  # noqa
     "CREATE INDEX coin_confirmed_index on coin_record(confirmed_index)",
     "CREATE INDEX coin_spent_index on coin_record(spent_index)",
     "CREATE INDEX coin_spent on coin_record(spent)",

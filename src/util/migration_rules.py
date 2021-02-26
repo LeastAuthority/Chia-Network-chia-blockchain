@@ -1,4 +1,4 @@
-from typing import Dict, List, Callable
+from typing import List, Callable
 import aiosqlite
 from os import listdir, unlink
 from shutil import copyfile
@@ -11,7 +11,7 @@ from shutil import copyfile
 # Run every migration set of steps that exist since the old version
 
 
-class Migration():
+class Migration:
     version: int
     schema: List[str]  # List of strings
     migration_steps: Callable
@@ -45,13 +45,18 @@ async def migrate(old_folder, new_folder, MIGRATION_UPDATES_LIST):
             genesis_block_str = split_f[2][:-7]
 
     if current_chia_version is None:
-        connection = await aiosqlite.connect(f"{new_folder}/db/blockchain_v{MIGRATION_UPDATES_LIST[-1].version}_{genesis_block_str}.sqlite")
+        connection = await aiosqlite.connect(
+            f"{new_folder}/db/blockchain_v{MIGRATION_UPDATES_LIST[-1].version}_{genesis_block_str}.sqlite"
+        )
         create_tables_from_schemadict(connection, MIGRATION_UPDATES_LIST[-1].schema, MIGRATION_UPDATES_LIST[-1].version)
         connection.close()
         return
 
     if current_chia_version >= MIGRATION_UPDATES_LIST[-1].version:
-        copyfile(f"{old_folder}/db/blockchain_v{current_chia_version}_{genesis_block_str}.sqlite", f"{new_folder}/db/blockchain_v{current_chia_version}_{genesis_block_str}.sqlite")
+        copyfile(
+            f"{old_folder}/db/blockchain_v{current_chia_version}_{genesis_block_str}.sqlite",
+            f"{new_folder}/db/blockchain_v{current_chia_version}_{genesis_block_str}.sqlite",
+        )
         return
 
     for mig in MIGRATION_UPDATES_LIST:
@@ -59,7 +64,9 @@ async def migrate(old_folder, new_folder, MIGRATION_UPDATES_LIST):
             continue
         connection = await aiosqlite.connect(f"{new_folder}/db/blockchain_v{mig.version}_{genesis_block_str}.sqlite")
         await create_tables_from_schemadict(connection, mig.schema, mig.version)
-        old_connection = await aiosqlite.connect(f"{old_folder}/db/blockchain_v{current_chia_version}_{genesis_block_str}.sqlite")
+        old_connection = await aiosqlite.connect(
+            f"{old_folder}/db/blockchain_v{current_chia_version}_{genesis_block_str}.sqlite"
+        )
         await mig.migration_steps(old_connection, connection)
         await connection.close()
         await old_connection.close()
