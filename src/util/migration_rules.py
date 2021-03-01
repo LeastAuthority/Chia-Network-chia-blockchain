@@ -36,9 +36,7 @@ async def create_tables_from_schemadict(connection, schema, version):
 
 
 async def get_genesis_block_str(connection):
-    cursor = await connection.execute(
-        "SELECT * FROM block_records WHERE height = 0"
-    )
+    cursor = await connection.execute("SELECT * FROM block_records WHERE height = 0")
     row = await cursor.fetchone()
     if row is not None:
         return row[1].hex()[0:16]
