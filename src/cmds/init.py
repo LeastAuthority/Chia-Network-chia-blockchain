@@ -379,7 +379,6 @@ def chia_init(root_path: Path):
     # These are the files that will be migrated
     MANIFEST: List[str] = [
         "config",
-        "db/blockchain_v27_2.db",
         # "wallet",
     ]
 

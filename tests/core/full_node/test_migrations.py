@@ -2,7 +2,7 @@ import pytest
 import asyncio
 import os
 import shutil
-from src.util.migration_rules import create_tables_from_schemadict, migrate, Migration
+from src.util.migration_rules import create_tables_from_schemadict, migrate, Migration, get_genesis_block_str
 from src.util.hash import std_hash
 from typing import List
 import aiosqlite
@@ -185,7 +185,7 @@ class TestMigrations:
     async def test_migration(self):
         old_folder = "tests/util/old_temp"
         new_folder = "tests/util/new_temp"
-        genesis_block_str = std_hash(0xDEADB33F).hex()
+        genesis_block_str = std_hash(0xDEADB33F).hex()[0:16]
 
         delete_temp_folder(f"{new_folder}/db")
         assert count_files_in_folder(f"{new_folder}/db") == 0
@@ -217,4 +217,5 @@ class TestMigrations:
         cursor = await connection.execute("SELECT * FROM schema_version")
         row = await cursor.fetchone()
         assert row[1] == 3
+        assert genesis_block_str == await get_genesis_block_str(connection)
         await connection.close()

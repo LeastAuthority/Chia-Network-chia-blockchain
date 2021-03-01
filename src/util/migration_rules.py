@@ -35,6 +35,16 @@ async def create_tables_from_schemadict(connection, schema, version):
     return
 
 
+async def get_genesis_block_str(connection):
+    cursor = await connection.execute(
+        "SELECT * FROM block_records WHERE height = 0"
+    )
+    row = await cursor.fetchone()
+    if row is not None:
+        return row[1].hex()[0:16]
+    return
+
+
 async def migrate(old_folder, new_folder, MIGRATION_UPDATES_LIST):
     current_chia_version = None
     for f in listdir(f"{old_folder}/db"):
