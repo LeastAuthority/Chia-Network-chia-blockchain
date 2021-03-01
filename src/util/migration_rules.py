@@ -47,6 +47,7 @@ async def get_genesis_block_str(connection):
 
 async def migrate(old_folder, new_folder, MIGRATION_UPDATES_LIST):
     current_chia_version = None
+    # get previous version info
     for f in listdir(f"{old_folder}/db"):
         if f[0:12] == "blockchain_v":
             split_f = f.split("_")
@@ -54,6 +55,7 @@ async def migrate(old_folder, new_folder, MIGRATION_UPDATES_LIST):
             current_chia_version = int(split_f[1][1:])
             genesis_block_str = split_f[2][:-7]
 
+    # Create empty table if previous db doesn't exist
     if current_chia_version is None:
         connection = await aiosqlite.connect(
             f"{new_folder}/db/blockchain_v{MIGRATION_UPDATES_LIST[-1].version}_{genesis_block_str}.sqlite"
@@ -62,6 +64,7 @@ async def migrate(old_folder, new_folder, MIGRATION_UPDATES_LIST):
         connection.close()
         return
 
+    # If we are at the most recent update or higher, just copy the existing file
     if current_chia_version >= MIGRATION_UPDATES_LIST[-1].version:
         copyfile(
             f"{old_folder}/db/blockchain_v{current_chia_version}_{genesis_block_str}.sqlite",
@@ -69,6 +72,7 @@ async def migrate(old_folder, new_folder, MIGRATION_UPDATES_LIST):
         )
         return
 
+    # apply all relevant updates in order
     for mig in MIGRATION_UPDATES_LIST:
         if mig.version < current_chia_version:
             continue
@@ -83,6 +87,7 @@ async def migrate(old_folder, new_folder, MIGRATION_UPDATES_LIST):
         current_chia_version = mig.version
         old_folder = new_folder
 
+    # Delete temporary migration version
     for f in listdir(f"{old_folder}/db"):
         if f[0:12] == "blockchain_v" and int(f.split("_")[1][1:]) != mig.version:
             unlink(f"{old_folder}/db/{f}")
